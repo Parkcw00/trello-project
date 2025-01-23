@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
-import { update } from 'lodash';
 import { BoardDto } from './dto/board.dto';
 
 @Controller('board')

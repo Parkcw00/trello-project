@@ -18,7 +18,7 @@ export class Board {
   id: number;
 
   //   @ManyToOne(() => User, (user) => user.boards)??
-  //   @JoinColumn({ name: 'ornerId' })
+  //   @JoinColumn({ name: 'onerId' })
   //   users: User;
 
   //   @OneToMany(() => Member, (member) => member.board)
