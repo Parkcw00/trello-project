@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,9 +17,12 @@ export class Board {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //   @OneToMany(() => User, (user) => user.boards)??
+  //   @ManyToOne(() => User, (user) => user.boards)??
   //   @JoinColumn({ name: 'ornerId' })
-  //   user: User;
+  //   users: User;
+
+  //   @OneToMany(() => Member, (member) => member.board)
+  //   members: Member[];
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
@@ -30,7 +34,7 @@ export class Board {
   gitLink: string;
 
   @Column({ type: 'timestamp', nullable: false })
-  exprilDate: Date;
+  expriyDate: Date;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

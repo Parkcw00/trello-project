@@ -4,6 +4,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Board } from './board/entities/board.entity';
+import { BoardModule } from './board/board.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -16,7 +18,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [],
+    entities: [Board],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -38,6 +40,7 @@ const typeOrmModuleOptions = {
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    BoardModule,
   ],
   controllers: [],
   providers: [],
