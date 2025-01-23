@@ -13,7 +13,7 @@ export class BoardService {
     private boardRepository: Repository<Board>,
   ) {}
 
-  async getMyBoard(onerId: number) {
+  async getMyBoards(onerId: number) {
     return await this.boardRepository.findBy({
       onerId: onerId,
     });
@@ -21,7 +21,7 @@ export class BoardService {
 
   async getBoard(boardId: number) {
     return await this.boardRepository.findBy({
-      boardId: boardId,
+      id: boardId,
     });
   }
 
