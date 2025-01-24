@@ -26,13 +26,13 @@ export class BoardService {
   }
 
   async createBoard(
-    onerId: number,
+    ownerId: number,
     title: string,
     content: string,
     expriyDate: Date,
   ) {
     await this.boardRepository.save({
-      onerId: onerId,
+      ownerId: ownerId,
       title: title,
       content: content,
       expriyDate: expriyDate,
@@ -41,12 +41,12 @@ export class BoardService {
 
   async updateBoard(
     id: number,
-    onerId: number,
+    ownerId: number,
     title: string,
     content: string,
     expriyDate: Date,
   ) {
-    await this.verifyMessage(id, onerId);
+    await this.verifyMessage(id, ownerId);
     await this.boardRepository.update({ id }, { title, content, expriyDate });
   }
 
