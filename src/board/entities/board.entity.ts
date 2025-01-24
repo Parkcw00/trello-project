@@ -1,5 +1,7 @@
+
 import { Member } from 'src/member/entities/member.entity';
 import { User } from '../../user/entities/user.entity';
+
 import { ColumnEntity } from 'src/column/entities/column.entity';
 import {
   Column,
@@ -53,4 +55,7 @@ export class Board {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
+
+  @OneToMany(() => ColumnEntity, (column) => column.board)
+  columns: ColumnEntity[];
 }
