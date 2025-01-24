@@ -1,3 +1,4 @@
+import { ColumnEntity } from 'src/column/entities/column.entity';
 import {
   Column,
   CreateDateColumn,
@@ -44,4 +45,7 @@ export class Board {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
+
+  @OneToMany(() => ColumnEntity, (column) => column.board)
+  columns: ColumnEntity[];
 }
