@@ -55,12 +55,12 @@ export class BoardService {
     await this.boardRepository.delete({ id });
   }
 
-  private async verifyMessage(id: number, onerId: number) {
+  private async verifyMessage(id: number, ownerId: number) {
     const boardMessage = await this.boardRepository.findOneBy({
       id,
     });
 
-    if (_.isNil(boardMessage) || boardMessage.onerId !== onerId) {
+    if (_.isNil(boardMessage) || boardMessage.ownerId !== ownerId) {
       throw new NotFoundException(
         '보드를 찾을 수 없거나 수정/삭제할 권한이 없습니다.',
       );
