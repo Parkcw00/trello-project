@@ -1,4 +1,3 @@
-
 import { Member } from 'src/member/entities/member.entity';
 import { User } from '../../user/entities/user.entity';
 
@@ -26,11 +25,11 @@ export class Board {
   @JoinColumn({ name: 'ownerId' })
   user: User;
 
-  @Column({ type: 'bigint' })
+  @Column({ type: 'bigint', name: 'ownerId' })
   ownerId: number;
 
   @OneToMany(() => Member, (member) => member.board)
-  member: Member;
+  member: Member[];
 
   @OneToMany(() => ColumnEntity, (column) => column.board)
   column: ColumnEntity;
