@@ -5,7 +5,10 @@ import {Controller, Get, Headers,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import{CreateUserDto, LoginUserDto, UpdateUserDto,DeleteUserDto}from './dto/user.dto'
+import{CreateUserDto}from './dto/create-user.dto'
+import{LoginUserDto}from './dto/login-user.dto'
+import{UpdateUserDto}from './dto/update-user.dto'
+import{DeleteUserDto}from './dto/delete-user.dto'
 import { User } from './entities/user.entity';
 
 // 비번 암호화해서 저장하기
@@ -170,35 +173,29 @@ async update( updateUserDto: UpdateUserDto, authorization:string) {
     }
 
     // 조회
-const myInfo = await this.userRepository.findOne({
-  where:{id : myId},
-});
+  const myInfo = await this.userRepository.findOne({
+    where:{id : myId},
+  });
 
-if (_.isNil(myInfo)) {
-  throw new NotFoundException(`토큰오류.`);
-}
-    // 비번 비교
-    if (updateUserDto.password !==myInfo.password) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-    }
-
-
-  updateUserDto.name? updateUserDto.name:myInfo.name
-  updateUserDto.email? updateUserDto.email:myInfo.email
-
-  // 비밀번호 업데이트를 별도로 처리
-  if (updateUserDto.newPassword) {
-    // 비밀번호 해싱 (예: bcrypt)
-    //const hashedPassword = await this.hashPassword(updateUserDto.newPassword);
-    //updateUserDto.password = hashedPassword;
-    updateUserDto.password = updateUserDto.email
-    // `newPassword` 필드는 더 이상 필요 없으므로 제거
-    delete updateUserDto.newPassword;
+  if (_.isNil(myInfo)) {
+    throw new NotFoundException(`토큰오류.`);
   }
-    // 덮어쓰기
-    const updatedUser = this.userRepository.update({ id: myId },updateUserDto);
+  // 비번 비교    
+  if (updateUserDto.password !==myInfo.password) {
+    throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+  }
 
-  return updatedUser
+  // 업데이트할 데이터 생성
+  const updatedData: Partial<User> = {
+    name: updateUserDto.name || myInfo.name,
+    email: updateUserDto.email || myInfo.email,
+    password :updateUserDto.newPassword || myInfo.password
+  };
+  // 데이터베이스 업데이트
+  await this.userRepository.update({ id: myId }, updatedData);
+
+  // 업데이트된 사용자 반환
+  return this.userRepository.findOne({ where: { id: myId } });
 }
 
   

@@ -1,7 +1,9 @@
 import { Controller,  Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-
-import{CreateUserDto, LoginUserDto, UpdateUserDto,DeleteUserDto}from './dto/user.dto'
+import{CreateUserDto}from './dto/create-user.dto'
+import{LoginUserDto}from './dto/login-user.dto'
+import{UpdateUserDto}from './dto/update-user.dto'
+import{DeleteUserDto}from './dto/delete-user.dto'
 import { JwtService } from '@nestjs/jwt';
 
 
