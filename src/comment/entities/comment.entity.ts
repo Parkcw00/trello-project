@@ -15,7 +15,7 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })ㅁ
+  @Column({ type: 'text', nullable: false })ㅁ
   content: string;
 
   @CreateDateColumn()
