@@ -51,6 +51,6 @@ export class Board {
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
 
-  @OneToMany(() => ColumnEntity, (column) => column.board)
-  columns: ColumnEntity[];
+  @OneToMany(() => ColumnEntity, (column) => column.board) // 컬럼 엔티티와 1:n 관계 설정
+  columns: ColumnEntity[]; // 보드가 1 : 컬럼이 n 관계 설정
 }

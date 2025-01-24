@@ -13,28 +13,29 @@ export class ColumnService { // 서비스 클래스
     private columnRepository: Repository<ColumnEntity> // 리포지토리 인스턴스 생성
   ) {} // 생성자 메서드
   
-  async getMaxColumnPosition(boardId: number): Promise<number> {
-    const maxPosition = await this.columnRepository
-      .createQueryBuilder('column')
-      .select('MAX(column.columnPosition)', 'max')
-      .where('column.boardId = :boardId', { boardId })
-      .getRawOne();
-    return maxPosition.max ? Number(maxPosition.max) + 1 : 1;
+  async getMaxColumnPosition(boardId: number): Promise<number> {// 컬럼 최대 위치 조회 메서드
+    const maxPosition = await this.columnRepository // 컬럼 리포지토리를 사용해서 쿼리 빌더를 생성
+    // 여기서 쿼리 빌더란? 데이터베이트안에 있는 쿼리를 sql 쿼리를 직접 작성하지 않고도 쿼리를 작성할 수 있도록 도와주는 기능
+      .createQueryBuilder('column') // 컬럼 엔티티를 쿼리 빌더에 적용
+      .select('MAX(column.columnPosition)') // 컬럼 위치를 최대값으로 조회
+      .where('column.boardId = :boardId', { boardId }) // 보드 아이디를 조건으로 조회
+      .getRawOne(); // 쿼리 빌더를 사용해서 쿼리 실행
+    return maxPosition.max ? Number(maxPosition.max) + 1 : 1; // 포지션에서 가장 높은 숫자가 있으면 그 숫자에 1을 더한값을 반환 하고 아니면 그냥 1을 반환
   }
 
   async create(createColumnDto: CreateColumnDto) { // 데이터 생성 메서드 
-    const newPosition = await this.getMaxColumnPosition(createColumnDto.boardId);
-    const columnData = { ...createColumnDto, columnPosition: Number(newPosition) };
+    const newPosition = await this.getMaxColumnPosition(createColumnDto.boardId); // 컬럼 최대 위치 조회 메서드를 이용해 새로운 위치 조회
+    const columnData = { ...createColumnDto, columnPosition: Number(newPosition) }; // 생성 DTO 와 새로운 위치를 합쳐 컬럼 데이터를 생성
     console.log('Saving column with position:', columnData.columnPosition); // 디버깅용 로그
-    return this.columnRepository.save(columnData); // 리포지토리 인스턴스를 사용해서 데이터 저장
+    return this.columnRepository.save(columnData); // 새롭게 생성된 컬럼 데이터를 리포지토리 인스턴스를 이용해서 저장
   }
 
-  findAll() {
-    return `This action returns all column`;
+  findAll() { // 모든 컬럼 조회 메서드
+    return this.columnRepository.find(); // 리포지토리 인스턴스를 사용해서 모든 컬럼 데이터를 조회
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} column`;
+  findOne(id: number) { // 특정한 컬럼 조회 메서드
+    return this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
   }
 
   update(id: number, updateColumnDto: UpdateColumnDto) {
