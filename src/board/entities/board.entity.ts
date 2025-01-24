@@ -25,7 +25,7 @@ export class Board {
   @JoinColumn({ name: 'owner_id' })
   user: User;
 
-  @Column({ type: 'bigint', name: 'ownerId' })
+  @Column({ type: 'bigint' })
   ownerId: number;
 
   @OneToMany(() => Member, (member) => member.board)
