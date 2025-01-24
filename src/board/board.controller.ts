@@ -29,12 +29,7 @@ export class BoardController {
     /*@UserInfo() user: User*/
     @Body() boardDto: BoardDto,
   ) {
-    await this.boardService.createBoard(
-      /*user.id*/ 2,
-      boardDto.title,
-      boardDto.content,
-      boardDto.expriyDate,
-    );
+    await this.boardService.createBoard(/*user.id*/ 2, boardDto);
   }
 
   @Patch(':boardId')
@@ -46,9 +41,7 @@ export class BoardController {
     return await this.boardService.updateBoard(
       boardId,
       /*user.id*/ 2,
-      boardDto.title,
-      boardDto.content,
-      boardDto.expriyDate,
+      boardDto,
     );
   }
 
