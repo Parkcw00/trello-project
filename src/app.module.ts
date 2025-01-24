@@ -5,6 +5,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { CommentModule } from './comment/comment.module';
+import { ColumnModule } from './column/column.module'; // 컬럼 모듈 가져오기
+import { ColumnEntity } from './column/entities/column.entity'; // 엔티티 가져오기
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -17,7 +19,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [],
+    entities: [ColumnEntity], // 이곳에서 자신의 작업물의 엔티티 등록
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -40,6 +42,7 @@ const typeOrmModuleOptions = {
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     CommentModule,
+    ColumnModule,
   ],
   controllers: [],
   providers: [],
