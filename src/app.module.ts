@@ -7,6 +7,11 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { CommentModule } from './comment/comment.module';
 import { ColumnModule } from './column/column.module'; // 컬럼 모듈 가져오기
 import { ColumnEntity } from './column/entities/column.entity'; // 엔티티 가져오기
+import { UserModule } from './user/user.module';
+import { CardModule } from './card/card.module';
+import { AlarmModule } from './alarm/alarm.module';
+import { MemberModule } from './member/member.module';
+import { UserModule } from './user/user.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -43,6 +48,10 @@ const typeOrmModuleOptions = {
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     CommentModule,
     ColumnModule,
+    UserModule,
+    MemberModule,
+    AlarmModule,
+    CardModule,
   ],
   controllers: [],
   providers: [],

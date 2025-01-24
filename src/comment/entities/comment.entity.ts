@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -14,7 +15,7 @@ export class Comment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false })ㅁ
   content: string;
 
   @CreateDateColumn()
@@ -22,4 +23,8 @@ export class Comment {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  // 멤버아이디랑 카드아이디 받기
+
+  @ManyToOne(()=> Member, (member)=> member.comments)
 }
