@@ -16,7 +16,7 @@ import {
 import { Member } from 'src/member/entities/member.entity';
 
 @Entity({
-  name: 'alarms,',
+  name: 'alarms',
 })
 export class Alarm {
   @PrimaryGeneratedColumn()
@@ -35,14 +35,14 @@ export class Alarm {
   isRead: string;
 
   @ManyToOne(() => Member, (member) => member.alarm)
-  @JoinColumn({ name: 'memberId' })
+  @JoinColumn({ name: 'member_id' })
   member: Member;
 
   @Column({ type: 'bigint' })
   memberId: number;
 
   @ManyToOne(() => Card, (card) => card.alarm)
-  @JoinColumn({ name: 'cardId' })
+  @JoinColumn({ name: 'card_id' })
   card: Card;
 
   @Column({ type: 'bigint' })

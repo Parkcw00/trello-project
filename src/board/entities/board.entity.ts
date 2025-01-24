@@ -22,7 +22,7 @@ export class Board {
   id: number;
 
   @ManyToOne(() => User, (user) => user.board)
-  @JoinColumn({ name: 'ownerId' })
+  @JoinColumn({ name: 'owner_id' })
   user: User;
 
   @Column({ type: 'bigint', name: 'ownerId' })
@@ -30,9 +30,6 @@ export class Board {
 
   @OneToMany(() => Member, (member) => member.board)
   member: Member[];
-
-  @OneToMany(() => ColumnEntity, (column) => column.board)
-  column: ColumnEntity;
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
