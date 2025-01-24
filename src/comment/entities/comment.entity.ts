@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 
 @Entity({
-  name: 'comments,',
+  name: 'comments',
 })
 export class Comment {
   @PrimaryGeneratedColumn()
@@ -29,14 +29,14 @@ export class Comment {
 
   // 멤버아이디랑 카드아이디 받기
   @ManyToOne(() => Member, (member) => member.comment)
-  @JoinColumn({ name: 'memberId' })
+  @JoinColumn({ name: 'member_id' })
   member: Member;
 
   @Column({ type: 'bigint', nullable: false })
   memberId: number;
 
   @ManyToOne(() => Card, (card) => card.comment)
-  @JoinColumn({ name: 'cardId' })
+  @JoinColumn({ name: 'card_id' })
   card: Card;
 
   @Column({ type: 'bigint', nullable: false })

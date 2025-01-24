@@ -4,20 +4,15 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Board } from './board/entities/board.entity';
+
 import { BoardModule } from './board/board.module';
 import { CommentModule } from './comment/comment.module';
 import { ColumnModule } from './column/column.module'; // 컬럼 모듈 가져오기
-import { ColumnEntity } from './column/entities/column.entity'; // 엔티티 가져오기
+
 import { CardModule } from './card/card.module';
 import { AlarmModule } from './alarm/alarm.module';
 import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
-// import { Card } from './card/entities/card.entity';
-// import { Comment } from './comment/entities/comment.entity';
-// import { Member } from './member/entities/member.entity';
-// import { User } from './user/entities/user.entity';
-// import { Alarm } from './alarm/entities/alarm.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -30,8 +25,8 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [__dirname + 'entities/**/*.entity.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록
-    synchronize: configService.get('DB_SYNC'),
+    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록
+    synchronize: true,
     logging: true,
   }),
   inject: [ConfigService],
