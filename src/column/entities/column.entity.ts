@@ -20,15 +20,15 @@ export class ColumnEntity {
   columnType: string; // 타입 지정 ( 문자열 타입 )
 
   @Column({ type: 'bigint', nullable: false }) // 컬럼 데코레이터 사용
-  columnPosition: number; // 타입 지정 ( 숫자 타입 )
+  columnPosition?: number; // 타입 지정 ( 숫자 타입 )
 
-  @ManyToOne(() => Board, (board) => board.columns)
-  @JoinColumn({ name: 'board_id' })
-  board: Board;
+  @ManyToOne(() => Board, (board) => board.columns) // 보드 엔티티와 n:1 관계 설정
+  @JoinColumn({ name: 'board_id' }) // 보드 아이디를 조건으로 조회
+  board: Board; // 보드 엔티티 인스턴스 생성
 
   @Column({ type: 'bigint', nullable: false }) // 컬럼 데코레이터 사용
   boardId: number; // 타입 지정 ( 숫자 타입 )
 
-  @OneToMany(() => Card, (card) => card.column)
-  card: Card[];
+  @OneToMany(() => Card, (card) => card.column) // 카드 엔티티와 1:n 관계 설정
+  card: Card[]; // 카드 엔티티 인스턴스 배열 생성
 }
