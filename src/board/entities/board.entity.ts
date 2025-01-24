@@ -22,7 +22,7 @@ export class Board {
 
   @ManyToOne(() => User, (user) => user.board)
   @JoinColumn({ name: 'owner_id' })
-  user: User;
+  user: User[];
 
   @Column({ type: 'bigint' })
   ownerId: number;

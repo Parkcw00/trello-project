@@ -12,8 +12,21 @@ export class ColumnService { // 서비스 클래스
     @InjectRepository(ColumnEntity) // 리포지토리 의존성 주입
     private columnRepository: Repository<ColumnEntity> // 리포지토리 인스턴스 생성
   ) {} // 생성자 메서드
-  create(createColumnDto: CreateColumnDto) { // 데이터 생성 메서드 
-    return this.columnRepository.save(createColumnDto); // 리포지토리 인스턴스를 사용해서 데이터 저장
+  
+  async getMaxColumnPosition(boardId: number): Promise<number> {
+    const maxPosition = await this.columnRepository
+      .createQueryBuilder('column')
+      .select('MAX(column.columnPosition)', 'max')
+      .where('column.boardId = :boardId', { boardId })
+      .getRawOne();
+    return maxPosition.max ? Number(maxPosition.max) + 1 : 1;
+  }
+
+  async create(createColumnDto: CreateColumnDto) { // 데이터 생성 메서드 
+    const newPosition = await this.getMaxColumnPosition(createColumnDto.boardId);
+    const columnData = { ...createColumnDto, columnPosition: Number(newPosition) };
+    console.log('Saving column with position:', columnData.columnPosition); // 디버깅용 로그
+    return this.columnRepository.save(columnData); // 리포지토리 인스턴스를 사용해서 데이터 저장
   }
 
   findAll() {

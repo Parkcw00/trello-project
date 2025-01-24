@@ -20,7 +20,7 @@ export class ColumnEntity {
   columnType: string; // 타입 지정 ( 문자열 타입 )
 
   @Column({ type: 'bigint', nullable: false }) // 컬럼 데코레이터 사용
-  columnPosition: number; // 타입 지정 ( 숫자 타입 )
+  columnPosition?: number; // 타입 지정 ( 숫자 타입 )
 
   @ManyToOne(() => Board, (board) => board.columns)
   @JoinColumn({ name: 'board_id' })
