@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { Repository } from 'typeorm';
-
-import {
+import {Controller, Get, Headers,
   ConflictException, Injectable, NotFoundException, UnauthorizedException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,11 +16,9 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService, // JWT 토큰 생성을 위해 주입한 서비스
   ) {}
-//POST	회원가입	/user/signup
-  signup(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
 
+
+//POST	회원가입	/user/signup
   async create(createUserDto: CreateUserDto) {
     const existUser = await this.userRepository.findOne({
       where:{email:createUserDto.email}
@@ -73,19 +70,33 @@ logout() {
 
 // test용 전체조회
   async findAll() {
-
     const user = await this.userRepository.find({
-      select: ['name','email'],
     });
-
     if (_.isNil(user)) {
       throw new NotFoundException(`유저를 찾을 수 없습니다.`);
     }
     return user
   }
-//GET	회원 정보 조회	/user/:userId
-async findOne(userId: number) {
 
+//GET	회원 정보 조회	/user/:userId
+async findOne(userId:number, authorization:string) {
+    if (!authorization) {
+      throw new UnauthorizedException('JWT 토큰이 필요합니다.');
+    }
+
+    const token = authorization.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
+    }
+    const payload = this.jwtService.verify(token);
+    const myId = payload.id;
+
+    if (!myId) {
+      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+    }
+      if (!userId) {
+        throw new UnauthorizedException('찾으려는 userId를 입력하세요');
+      }
   const user = await this.userRepository.findOne({
     where:{id:userId},
     select: ['name','email'],
@@ -98,25 +109,48 @@ async findOne(userId: number) {
 }
 
 //GET	내 정보 상세조회	/user/me
-  async findMe(userId: number) {
-    const user = await this.userRepository.findOne({
-      where:{id:userId},
-      select: ['name','email'],
+  async findMe(authorization:string) {
+    if (!authorization) {
+      throw new UnauthorizedException('JWT 토큰이 필요합니다.');
+    }
+
+    const token = authorization.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
+    }
+
+      const payload = this.jwtService.verify(token);
+      const userId = payload.id;
+
+      if (!userId) {
+        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+      }
+const user = await this.userRepository.findOne({
+      where:{id : userId},
+      select: ['name','email','password'],
     });
 
     if (_.isNil(user)) {
       throw new NotFoundException(`토큰오류.`);
     }
     return user
-  }
+
+}
+
+    
+  
 
 //PATCH	회원 정보 수정	/user/me
-  update(id: number, updateUserDto: UpdateUserDto) {
+async update( updateUserDto: UpdateUserDto, authorization:string) {
    
+    //  const newUser = await this.userRepository.save(createUserDto);
+   // await this.postRepository.update({ id }, { content });      
   }
 //DELETE	회원 탈퇴	/user/me 
 
-  remove(id: number) {
+  async remove(authorization:string) {
    
+    // const newUser = await this.userRepository.save(createUserDto);
+  // return this.postRepository.softDelete({ id });
   }
 }

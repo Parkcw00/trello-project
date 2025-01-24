@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+
+import { JwtService } from '@nestjs/jwt';
+
 
 @Controller('user')
 export class UserController {
@@ -36,27 +39,26 @@ async users() {
 async logout(@Headers('Authorization') token: string) {
   return this.userService.logout(token);
 }
-
-@Get(':userId')
-async getUser(@Param('userId') userId: string, @Headers('Authorization') token: string) {
-  return this.userService.getUser(userId, token);
-}
 */
+@Get(':userId')
+async getUserInfo(@Headers('authorization') authorization: string, @Param('userId') userId:number) {
+  return this.userService.findOne(userId, authorization);
+}
+
 
 @Get('me')
-async getMyInfo(@Req() req: any) {
-  const userPayload = req.user;
-  return this.userService.findMe(userPayload);
+async getMyInfo(@Headers('authorization') authorization: string) {
+  return this.userService.findMe(authorization);
 }
 
-/*
+
 @Patch('me')
-async updateUser(@Body() updateUserDto: UpdateUserDto, @Headers('Authorization') token: string) {
-  return this.userService.updateUser(updateUserDto, token);
+async updateUser(@Body() updateUserDto: UpdateUserDto,@Headers('authorization') authorization: string) {
+  return this.userService.update(updateUserDto, authorization);
 }
 
 @Delete('me')
-async deleteUser(@Headers('Authorization') token: string) {
-  return this.userService.deleteUser(token);
-}*/
+async deleteUser(@Headers('authorization') authorization: string) {
+  return this.userService.remove(authorization);
+}
 }
