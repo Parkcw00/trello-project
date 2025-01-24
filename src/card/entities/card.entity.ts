@@ -47,14 +47,14 @@ export class Card {
   deletedAt: Date;
 
   @ManyToOne(() => ColumnEntity, (column) => column.card)
-  @JoinColumn({ name: 'columnId' })
+  @JoinColumn({ name: 'column_id' })
   column: ColumnEntity;
 
   @Column({ type: 'bigint' })
   columnId: number;
 
   @ManyToOne(() => Member, (member) => member.card)
-  @JoinColumn({ name: 'memberId' })
+  @JoinColumn({ name: 'member_id' })
   member: Member;
 
   @Column({ type: 'bigint' })

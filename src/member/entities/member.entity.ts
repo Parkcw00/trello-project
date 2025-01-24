@@ -16,7 +16,7 @@ import {
 } from 'typeorm';
 
 @Entity({
-  name: 'members,',
+  name: 'members',
 })
 export class Member {
   @PrimaryGeneratedColumn()
@@ -36,14 +36,14 @@ export class Member {
   @ManyToOne(() => User, (user) => user.member, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'userId' })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @Column({ type: 'bigint' })
   userId: number;
 
   @ManyToOne(() => Board, (board) => board.member)
-  @JoinColumn({ name: 'boardId' })
+  @JoinColumn({ name: 'board_id' })
   board: Board;
 
   @Column({ type: 'bigint' })
