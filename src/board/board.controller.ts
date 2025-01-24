@@ -21,7 +21,7 @@ export class BoardController {
 
   @Get() //내 보드들 조회
   async getMyBoards(/*@UserInfo() user: User*/) {
-    return await this.boardService.getMyBoards(1 /*user.id*/);
+    return await this.boardService.getMyBoards(2 /*user.id*/);
   }
 
   @Post() //보드 생성
@@ -30,7 +30,7 @@ export class BoardController {
     @Body() boardDto: BoardDto,
   ) {
     await this.boardService.createBoard(
-      /*user.id*/ 1,
+      /*user.id*/ 2,
       boardDto.title,
       boardDto.content,
       boardDto.expriyDate,
@@ -45,7 +45,7 @@ export class BoardController {
   ) {
     return await this.boardService.updateBoard(
       boardId,
-      /*user.id*/ 1,
+      /*user.id*/ 2,
       boardDto.title,
       boardDto.content,
       boardDto.expriyDate,
@@ -57,6 +57,6 @@ export class BoardController {
     /*@UserInfo() user: User*/
     @Param('boardId') boardId: number,
   ) {
-    return await this.boardService.deleteBoard(boardId, 1 /*user.id*/);
+    return await this.boardService.deleteBoard(boardId, 2 /*user.id*/);
   }
 }
