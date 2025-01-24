@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,16 +17,21 @@ GET	내 정보 상세조회	/user/me
 PATCH	회원 정보 수정	/user/me
 DELETE	회원 탈퇴	/user/me */
 
-@Post('signup')
+@Post('/signup')
 async signUp(@Body() createUserDto: CreateUserDto) {
-  return this.userService.signup(createUserDto);
+  return this.userService.create(createUserDto);
 }
 
-@Post('login')
+@Post('/login')
 async login(@Body() loginUserDto: LoginUserDto) {
   return this.userService.login(loginUserDto);
 }
 
+@Get('/users')
+async users() {
+  return this.userService.findAll();
+}
+/*
 @Post('logout')
 async logout(@Headers('Authorization') token: string) {
   return this.userService.logout(token);
@@ -36,12 +41,15 @@ async logout(@Headers('Authorization') token: string) {
 async getUser(@Param('userId') userId: string, @Headers('Authorization') token: string) {
   return this.userService.getUser(userId, token);
 }
+*/
 
 @Get('me')
-async getMyInfo(@Headers('Authorization') token: string) {
-  return this.userService.getMyInfo(token);
+async getMyInfo(@Req() req: any) {
+  const userPayload = req.user;
+  return this.userService.findMe(userPayload);
 }
 
+/*
 @Patch('me')
 async updateUser(@Body() updateUserDto: UpdateUserDto, @Headers('Authorization') token: string) {
   return this.userService.updateUser(updateUserDto, token);
@@ -50,5 +58,5 @@ async updateUser(@Body() updateUserDto: UpdateUserDto, @Headers('Authorization')
 @Delete('me')
 async deleteUser(@Headers('Authorization') token: string) {
   return this.userService.deleteUser(token);
-}
+}*/
 }
