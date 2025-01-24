@@ -1,9 +1,7 @@
-import { Controller, Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,  Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
 
+import{CreateUserDto, LoginUserDto, UpdateUserDto,DeleteUserDto}from './dto/user.dto'
 import { JwtService } from '@nestjs/jwt';
 
 
@@ -58,7 +56,7 @@ async updateUser(@Body() updateUserDto: UpdateUserDto,@Headers('authorization') 
 }
 
 @Delete('me')
-async deleteUser(@Headers('authorization') authorization: string) {
-  return this.userService.remove(authorization);
+async deleteUser(@Body() deleteUserDto:DeleteUserDto,@Headers('authorization') authorization: string) {
+  return this.userService.remove(deleteUserDto, authorization);
 }
 }
