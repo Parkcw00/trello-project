@@ -1,5 +1,6 @@
 import { Member } from 'src/member/entities/member.entity';
 import { User } from '../../user/entities/user.entity';
+import { ColumnEntity } from 'src/column/entities/column.entity';
 import {
   Column,
   CreateDateColumn,
@@ -20,11 +21,17 @@ export class Board {
   id: number;
 
   @ManyToOne(() => User, (user) => user.board)
-  @JoinColumn({ name: 'onerId' })
+  @JoinColumn({ name: 'ownerId' })
   user: User;
+
+  @Column({ type: 'bigint' })
+  ownerId: number;
 
   @OneToMany(() => Member, (member) => member.board)
   member: Member;
+
+  @OneToMany(() => ColumnEntity, (column) => column.board)
+  column: ColumnEntity;
 
   @Column({ type: 'varchar', nullable: false })
   title: string;

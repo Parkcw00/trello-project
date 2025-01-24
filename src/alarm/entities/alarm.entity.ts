@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -33,18 +34,15 @@ export class Alarm {
   @Column({ type: 'boolean', default: false })
   isRead: string;
 
-  @ManyToOne(() => User, (user) => user.member, {
-    onDelete: 'CASCADE',
-  })
-  user: User;
-
   @ManyToOne(() => Member, (member) => member.alarm)
+  @JoinColumn({ name: 'memberId' })
   member: Member;
 
   @Column({ type: 'bigint' })
   memberId: number;
 
   @ManyToOne(() => Card, (card) => card.alarm)
+  @JoinColumn({ name: 'cardId' })
   card: Card;
 
   @Column({ type: 'bigint' })

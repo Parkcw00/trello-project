@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -35,16 +36,18 @@ export class Member {
   @ManyToOne(() => User, (user) => user.member, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'bigint' })
   userId: number;
 
   @ManyToOne(() => Board, (board) => board.member)
-  member: Member;
+  @JoinColumn({ name: 'boardId' })
+  board: Board;
 
   @Column({ type: 'bigint' })
-  memberId: number;
+  boardId: number;
 
   @OneToMany(() => Alarm, (alarm) => alarm.member)
   alarm: Alarm[];
