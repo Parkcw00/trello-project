@@ -1,3 +1,7 @@
+
+import { Member } from 'src/member/entities/member.entity';
+import { User } from '../../user/entities/user.entity';
+
 import { ColumnEntity } from 'src/column/entities/column.entity';
 import {
   Column,
@@ -18,12 +22,18 @@ export class Board {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //   @ManyToOne(() => User, (user) => user.boards)??
-  //   @JoinColumn({ name: 'onerId' })
-  //   users: User;
+  @ManyToOne(() => User, (user) => user.board)
+  @JoinColumn({ name: 'ownerId' })
+  user: User;
 
-  //   @OneToMany(() => Member, (member) => member.board)
-  //   members: Member[];
+  @Column({ type: 'bigint' })
+  ownerId: number;
+
+  @OneToMany(() => Member, (member) => member.board)
+  member: Member;
+
+  @OneToMany(() => ColumnEntity, (column) => column.board)
+  column: ColumnEntity;
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
