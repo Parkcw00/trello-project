@@ -13,6 +13,11 @@ import { CardModule } from './card/card.module';
 import { AlarmModule } from './alarm/alarm.module';
 import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
+import { Card } from './card/entities/card.entity';
+import { Comment } from './comment/entities/comment.entity';
+import { Member } from './member/entities/member.entity';
+import { User } from './user/entities/user.entity';
+import { Alarm } from './alarm/entities/alarm.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -25,7 +30,7 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [ColumnEntity, Board], // 이곳에서 자신의 작업물의 엔티티 등록
+    entities: [ColumnEntity, Board, Card, Member, User, Comment, Alarm], // 이곳에서 자신의 작업물의 엔티티 등록
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),

@@ -1,12 +1,10 @@
 import { Board } from 'src/board/entities/board.entity';
 import { Member } from 'src/member/entities/member.entity';
-import { Board } from 'src/board/entities/board.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
