@@ -1,10 +1,10 @@
+import { Board } from 'src/board/entities/board.entity';
 import { Member } from 'src/member/entities/member.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -31,9 +31,9 @@ export class User {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Member, (member) => member.users)
-  members: Member[];
+  @OneToMany(() => Member, (member) => member.user)
+  member: Member[];
 
-  @OneToMany(() => Board, (board) => board.users)
+  @OneToMany(() => Board, (board) => board.user)
   board: Board[];
 }
