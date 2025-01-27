@@ -1,15 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { Column } from 'typeorm';
 
-@Controller('card')
+@Controller('columns/:columnId/cards')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
 
   @Post()
-  create(@Body() createCardDto: CreateCardDto) {
-    return this.cardService.create(createCardDto);
+  create(
+    @Param('columnId', ParseIntPipe) columnId: number,
+    @Body() createCardDto: CreateCardDto,
+  ) {
+    return this.cardService.createCard(columnId, createCardDto);
   }
 
   @Get()
