@@ -29,11 +29,11 @@ export class ColumnService { // 서비스 클래스
     return this.columnRepository.save(columnData); // 새롭게 생성된 컬럼 데이터를 리포지토리 인스턴스를 이용해서 저장
   }
 
-    async findAll() { // 모든 컬럼 조회 메서드
+    async findAll(): Promise<ColumnEntity[]> { // 모든 컬럼 조회 메서드
       return await this.columnRepository.find(); // 리포지토리 인스턴스를 사용해서 모든 컬럼 데이터를 조회
     }
 
-  async findOne(id: number) { // 특정한 컬럼 조회 메서드
+  async findOne(id: number): Promise<ColumnEntity> { // 특정한 컬럼 조회 메서드
     const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
     
     if(!column) { // 컬럼이 존재하지 않은 경우 오류 발생.
@@ -45,7 +45,7 @@ export class ColumnService { // 서비스 클래스
     
   }
 
-  async update(id: number, updateColumnDto: UpdateColumnDto) { // 컬럼 업데이트 메서드
+  async update(id: number, updateColumnDto: UpdateColumnDto): Promise<string> { // 컬럼 업데이트 메서드
     const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
 
     if (!column) {
@@ -63,16 +63,16 @@ export class ColumnService { // 서비스 클래스
             await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
                 .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
                 .update(ColumnEntity) // 컬럼 엔티티를 업데이트
-                .set({ columnPosition: () => "columnPosition - 1" }) // 컬럼 포지션을 앞으로 이동
                 .where("columnPosition > :nowCurrentPosition AND columnPosition <= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 크고 새로운 위치보다 작거나 같은 컬럼들을 조회
+                .set({ columnPosition: () => "columnPosition - 1" }) // 컬럼 포지션을 앞으로 이동
                 .execute(); // 쿼리빌더를 사용해서 쿼리 실행
         } else {
             // 현재 위치보다 작은 위치의 컬럼들을 하나씩 뒤로 이동
             await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
                 .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
                 .update(ColumnEntity) // 컬럼 엔티티를 업데이트
-                .set({ columnPosition: () => "columnPosition + 1" }) // 컬럼 포지션을 뒤로 이동
                 .where("columnPosition < :nowCurrentPosition AND columnPosition >= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 작고 새로운 위치보다 크거나 같은 컬럼들을 조회
+                .set({ columnPosition: () => "columnPosition + 1" }) // 컬럼 포지션을 뒤로 이동
                 .execute(); // 쿼리빌더를 사용해서 쿼리 실행
         }
     }
@@ -83,7 +83,7 @@ export class ColumnService { // 서비스 클래스
     return column + `선택한 ${id} 컬럼이 ${newPosition} 위치로 이동 되었습니다.`; // 업데이트된 컬럼 데이터를 반환
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<string> {
     const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
     if (!column) {
         throw new NotFoundException('컬럼이 존재하지 않습니다.'); // 컬럼이 존재하지 않을 경우 오류 발생
