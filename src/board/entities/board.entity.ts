@@ -28,7 +28,7 @@ export class Board {
   ownerId: number;
 
   @OneToMany(() => Member, (member) => member.board)
-  member: Member;
+  member: Member[];
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
