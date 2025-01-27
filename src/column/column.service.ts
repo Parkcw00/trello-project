@@ -1,6 +1,6 @@
 import _ from 'lodash'; // 배열, 객체, 문자열 등의 데이터를 쉽게 조작할 수 있도록 도와주는 라이브러리
 import { Repository } from 'typeorm'; // 데이터베이스 조작을 도와주는 라이브러리
-import { Injectable } from '@nestjs/common'; // 서비스 데코레이터
+import { Injectable, NotFoundException } from '@nestjs/common'; // 서비스 데코레이터
 import { CreateColumnDto } from './dto/create-column.dto'; // 생성 DTO 가져오기
 import { UpdateColumnDto } from './dto/update-column.dto'; // 업데이트 DTO 가져오기
 import { ColumnEntity } from './entities/column.entity'; // 엔티티 가져오기
@@ -34,15 +34,23 @@ export class ColumnService { // 서비스 클래스
     return this.columnRepository.find(); // 리포지토리 인스턴스를 사용해서 모든 컬럼 데이터를 조회
   }
 
-  findOne(id: number) { // 특정한 컬럼 조회 메서드
-    return this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
+  async findOne(id: number) { // 특정한 컬럼 조회 메서드
+    const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
+    
+    if(!column) { // 컬럼이 존재하지 않은 경우 오류 발생.
+      throw new NotFoundException('컬럼이 존재하지 않습니다.');
+    }
+
+    return column; // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
+
+    
   }
 
   update(id: number, updateColumnDto: UpdateColumnDto) {
     return `This action updates a #${id} column`;
   }
 
-  remove(id: number) {
+  delete(id: number) {
     return `This action removes a #${id} column`;
   }
 }

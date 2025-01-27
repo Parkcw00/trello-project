@@ -36,6 +36,6 @@ export class ColumnController { // 컨트롤러 클래스
   // @Roles(Role.Admin) // 권한 데코레이터를 사용해서 컴럼 삭제가 가능한 권한을 가진 사용자만 접근 가능하도록 설정
   @Delete(':id')
   remove(@Param('id') id: string) { // 컬럼 삭제 메서드
-    return this.columnService.remove(+id); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 삭제
+    return this.columnService.delete(+id); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 삭제
   }
 }
