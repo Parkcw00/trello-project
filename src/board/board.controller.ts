@@ -6,10 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  // UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { BoardDto } from './dto/board.dto';
+// import { AuthGuard } from '@nestjs/passport';
+// import { UserInfo } from './decorators/user-info.decorator'
 
+// @UseGuards(AuthGuard('jwt'))
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
@@ -32,7 +36,7 @@ export class BoardController {
     await this.boardService.createBoard(/*user.id*/ 2, boardDto);
   }
 
-  @Patch(':boardId')
+  @Patch(':boardId') //보드 수정
   async updateBoard(
     /*@UserInfo() user: User*/
     @Param('boardId') boardId: number,
@@ -45,11 +49,19 @@ export class BoardController {
     );
   }
 
-  @Delete(':boardId')
+  @Delete(':boardId') //보드 삭제
   async deleteBoard(
     /*@UserInfo() user: User*/
     @Param('boardId') boardId: number,
   ) {
     return await this.boardService.deleteBoard(boardId, 2 /*user.id*/);
+  }
+
+  @Get(':boardId/link') //보드 링크
+  async linkBoard(
+    /*@UserInfo() user: User*/
+    @Param('boardId') boardId: number,
+  ) {
+    return await this.boardService.linkBoard(boardId, 2 /*user.id*/);
   }
 }
