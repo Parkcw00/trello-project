@@ -16,7 +16,7 @@ export class ColumnEntity {
   @PrimaryGeneratedColumn() // 기본키 생성
   id: number; // 타입 지정 ( 숫자 타입 )
 
-  @Column({ type: 'varchar', nullable: false }) // 컬럼 데코레이터 사용
+  @Column({ type: 'varchar', nullable: false }) // 컬럼 데코레이터 사용 varchar 이건 문자열을 저장하는것.
   columnType: string; // 타입 지정 ( 문자열 타입 )
 
   @Column({ type: 'bigint', nullable: false }) // 컬럼 데코레이터 사용
