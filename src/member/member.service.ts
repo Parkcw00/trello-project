@@ -109,9 +109,9 @@ export class MemberService {
 
   /**
    * 특정 보드(boardId)에서 멤버(memberId) 삭제
-   * @param boardId - 멤버가 속한 보드 ID
-   * @param memberId - 삭제할 멤버의 ID
-   * @returns 성공 메시지
+   * @ param boardId - 멤버가 속한 보드 ID
+   * @ param memberId - 삭제할 멤버의 ID
+   * @ returns 성공 메시지
    */
   async delete(boardId: number, memberId: number): Promise<{ message: string }> {
     // 특정 멤버 조회
