@@ -38,8 +38,8 @@ export class MemberService {
    * - Authorization 헤더에서 JWT 토큰을 추출하고 검증함
    * - 검증이 성공하면 `userId` 반환, 실패하면 예외 발생
    *
-   * @param authorization - HTTP 요청 헤더에서 전달된 JWT 토큰
-   * @returns number - JWT에서 추출된 사용자 ID
+   * @ param authorization - HTTP 요청 헤더에서 전달된 JWT 토큰
+   * @ returns number - JWT에서 추출된 사용자 ID
    */
   private verifyToken(authorization: string): number {
     if (!authorization || !authorization.startsWith('Bearer ')) {
