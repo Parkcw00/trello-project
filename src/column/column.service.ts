@@ -20,7 +20,7 @@ export class ColumnService { // 서비스 클래스
       .select('MAX(column.columnPosition)', 'max') // 컬럼 위치를 최대값으로 조회
       .where('column.boardId = :boardId', { boardId }) // 보드 아이디를 조건으로 조회
       .getRawOne(); // 쿼리 빌더를 사용해서 쿼리 실행
-    return maxPosition.max ? Number(maxPosition.max) + 1 : 1; // 포지션에서 가장 높은 숫자가 있으면 그 숫자에 1을 더한값을 반환 하고 아니면 그냥 1을 반환
+    return maxPosition.max ? Number(maxPosition.max) + 10 : 10; // 포지션에서 가장 높은 숫자가 있으면 그 숫자에 1을 더한값을 반환 하고 아니면 그냥 1을 반환
   }
 
   async create(createColumnDto: CreateColumnDto) { // 데이터 생성 메서드 
@@ -45,42 +45,57 @@ export class ColumnService { // 서비스 클래스
     
   }
 
-  async update(id: number, updateColumnDto: UpdateColumnDto): Promise<string> { // 컬럼 업데이트 메서드
-    const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
+  async update(boardId: number, updateColumnDto: UpdateColumnDto) { // 컬럼 업데이트 메서드
+    const column = await this.columnRepository.find({ where: { boardId } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
 
     if (!column) {
         throw new NotFoundException('컬럼이 존재하지 않습니다.'); // 컬럼이 존재하지 않을 경우 오류 발생
     }
 
-    // 업데이트 DTO 에서 컬럼포지션 속성을 추출하여 뉴포지션 이라는 새로운 변수에 할당함.(구조분해할당)
-    const { columnPosition: newPosition } = updateColumnDto; 
-    const nowCurrentPosition = column.columnPosition; // 현재 컬럼 포지션을 현재포지션 이라는 새로운 변수에 할당함.(구조분해할당)
+    const nowColumn = column.find((column) => column.id === updateColumnDto.id);
+    console.log(`33333333333333333`,nowColumn);
 
-    if (newPosition !== nowCurrentPosition) {
-        // 이동 방향에 따라 다른 컬럼들의 위치를 조정
-        if (newPosition > nowCurrentPosition) {
-            // 현재 위치보다 큰 위치의 컬럼들을 하나씩 앞으로 이동
-            await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
-                .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
-                .update(ColumnEntity) // 컬럼 엔티티를 업데이트
-                .where("columnPosition > :nowCurrentPosition AND columnPosition <= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 크고 새로운 위치보다 작거나 같은 컬럼들을 조회
-                .set({ columnPosition: () => "columnPosition - 1" }) // 컬럼 포지션을 앞으로 이동
-                .execute(); // 쿼리빌더를 사용해서 쿼리 실행
-        } else {
-            // 현재 위치보다 작은 위치의 컬럼들을 하나씩 뒤로 이동
-            await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
-                .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
-                .update(ColumnEntity) // 컬럼 엔티티를 업데이트
-                .where("columnPosition < :nowCurrentPosition AND columnPosition >= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 작고 새로운 위치보다 크거나 같은 컬럼들을 조회
-                .set({ columnPosition: () => "columnPosition + 1" }) // 컬럼 포지션을 뒤로 이동
-                .execute(); // 쿼리빌더를 사용해서 쿼리 실행
-        }
-    }
-    // 변경된 컬럼의 위치 업데이트
-    column.columnPosition = newPosition; // 컬럼 포지션을 새로운 포지션으로 업데이트
-    await this.columnRepository.save(column); // 리포지토리 인스턴스를 사용해서 컬럼 데이터를 저장
+    // const middleColumn = column.find((column) => column.id === 
 
-    return column + `선택한 ${id} 컬럼이 ${newPosition} 위치로 이동 되었습니다.`; // 업데이트된 컬럼 데이터를 반환
+    const newColumn = column.find((column) => column.id === updateColumnDto.targetColumnId);
+    console.log(`44444444444444444`,newColumn);
+    console.log(`123123123`, nowColumn.columnPosition, newColumn.columnPosition);
+
+    const iii = column.find((column) => newColumn.columnPosition > nowColumn.columnPosition)
+console.log(`------>`,iii);
+    const newPosition = (nowColumn.columnPosition + newColumn.columnPosition) / 2;
+    console.log(`55555555555555555`,newPosition);
+    // // 업데이트 DTO 에서 컬럼포지션 속성을 추출하여 뉴포지션 이라는 새로운 변수에 할당함.(구조분해할당)
+    // const { columnPosition: newPosition } = updateColumnDto; 
+    // const nowCurrentPosition = column.columnPosition; // 현재 컬럼 포지션을 현재포지션 이라는 새로운 변수에 할당함.(구조분해할당)
+    
+
+    
+    // if (newPosition !== nowCurrentPosition) {
+    //     // 이동 방향에 따라 다른 컬럼들의 위치를 조정
+    //     if (newPosition > nowCurrentPosition) {
+    //         // 현재 위치보다 큰 위치의 컬럼들을 하나씩 앞으로 이동
+    //         await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
+    //             .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
+    //             .update(ColumnEntity) // 컬럼 엔티티를 업데이트
+    //             .where("columnPosition > :nowCurrentPosition AND columnPosition <= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 크고 새로운 위치보다 작거나 같은 컬럼들을 조회
+    //             .set({ columnPosition: () => "columnPosition - 1" }) // 컬럼 포지션을 앞으로 이동
+    //             .execute(); // 쿼리빌더를 사용해서 쿼리 실행
+    //     } else {
+    //         // 현재 위치보다 작은 위치의 컬럼들을 하나씩 뒤로 이동
+    //         await this.columnRepository // 리포지토리 인스턴스를 사용해서 쿼리 빌더를 생성
+    //             .createQueryBuilder() // 쿼리 빌더를 사용해서 쿼리를 작성
+    //             .update(ColumnEntity) // 컬럼 엔티티를 업데이트
+    //             .where("columnPosition < :nowCurrentPosition AND columnPosition >= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 작고 새로운 위치보다 크거나 같은 컬럼들을 조회
+    //             .set({ columnPosition: () => "columnPosition + 1" }) // 컬럼 포지션을 뒤로 이동
+    //             .execute(); // 쿼리빌더를 사용해서 쿼리 실행
+    //     }
+    // }
+    // // 변경된 컬럼의 위치 업데이트
+    // column.columnPosition = newPosition; // 컬럼 포지션을 새로운 포지션으로 업데이트
+    // await this.columnRepository.save(column); // 리포지토리 인스턴스를 사용해서 컬럼 데이터를 저장
+
+    // return column + `선택한 ${id} 컬럼이 ${newPosition} 위치로 이동 되었습니다.`; // 업데이트된 컬럼 데이터를 반환
   }
 
   async delete(id: number): Promise<string> {
