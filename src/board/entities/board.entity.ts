@@ -1,6 +1,5 @@
 import { Member } from 'src/member/entities/member.entity';
 import { User } from '../../user/entities/user.entity';
-
 import { ColumnEntity } from 'src/column/entities/column.entity';
 import {
   Column,
@@ -23,7 +22,7 @@ export class Board {
 
   @ManyToOne(() => User, (user) => user.board)
   @JoinColumn({ name: 'owner_id' })
-  user: User;
+  user: User[];
 
   @Column({ type: 'bigint' })
   ownerId: number;
@@ -52,6 +51,6 @@ export class Board {
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
 
-  @OneToMany(() => ColumnEntity, (column) => column.board)
-  columns: ColumnEntity[];
+  @OneToMany(() => ColumnEntity, (column) => column.board) // 컬럼 엔티티와 1:n 관계 설정
+  columns: ColumnEntity[]; // 보드가 1 : 컬럼이 n 관계 설정
 }
