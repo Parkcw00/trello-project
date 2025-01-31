@@ -1,34 +1,64 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,  Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import{CreateUserDto}from './dto/create-user.dto'
+import{LoginUserDto}from './dto/login-user.dto'
+import{UpdateUserDto}from './dto/update-user.dto'
+import{DeleteUserDto}from './dto/delete-user.dto'
+import { JwtService } from '@nestjs/jwt';
+
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
+/**POST	회원가입	/user/signup
+POST	로그인	/user/login
+POST	로그아웃	/user/logout
+GET	회원 정보 조회	/user/:userId
+GET	내 정보 상세조회	/user/me
+PATCH	회원 정보 수정	/user/me
+DELETE	회원 탈퇴	/user/me */
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
+@Post('/signup')
+async signUp(@Body() createUserDto: CreateUserDto) {
+  return this.userService.create(createUserDto);
+}
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
+@Post('/login')
+async login(@Body() loginUserDto: LoginUserDto) {
+  return this.userService.login(loginUserDto);
+}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+@Get('/users')
+async users() {
+  return this.userService.findAll();
+}
+/*
+@Post('logout')
+async logout(@Headers('Authorization') token: string) {
+  return this.userService.logout(token);
+}
+*/
+@Get(':userId')
+async getUserInfo(@Headers('authorization') authorization: string, @Param('userId') userId:number) {
+  return this.userService.findOne(userId, authorization);
+}
+
+
+@Get('me')
+async getMyInfo(@Headers('authorization') authorization: string) {
+  return this.userService.findMe(authorization);
+}
+
+
+@Patch('me')
+async updateUser(@Body() updateUserDto: UpdateUserDto,@Headers('authorization') authorization: string) {
+  return this.userService.update(updateUserDto, authorization);
+}
+
+@Delete('me')
+async deleteUser(@Body() deleteUserDto:DeleteUserDto,@Headers('authorization') authorization: string) {
+  return this.userService.remove(deleteUserDto, authorization);
+}
 }
