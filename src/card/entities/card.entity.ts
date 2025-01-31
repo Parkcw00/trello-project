@@ -2,6 +2,8 @@ import { Alarm } from 'src/alarm/entities/alarm.entity';
 import { ColumnEntity } from 'src/column/entities/column.entity';
 import { Member } from 'src/member/entities/member.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { File } from 'src/file/entities/file.entity';
+
 
 import {
   Column,
@@ -28,13 +30,13 @@ export class Card {
   @Column({ type: 'text', nullable: false }) // 컬럼 데코레이터 사용
   content: string; // 타입 지정 ( 숫자 타입 )
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   attachtment: string;
 
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date;
 
-  @Column({ type: 'bigint', nullable: true })
+  @Column({ type: 'bigint', nullable: false })
   cardPosition: number;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -65,4 +67,7 @@ export class Card {
 
   @OneToMany(() => Comment, (comment) => comment.card)
   comment: Comment[];
+
+  @OneToMany(() => File, (file) => file.card)
+  file: File[];
 }
