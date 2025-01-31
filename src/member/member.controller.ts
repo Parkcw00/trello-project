@@ -2,71 +2,151 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Put,
-  Param,
+  Patch,
   Delete,
+  Param,
+  Headers,
+  Body,
 } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+  ApiHeader,
+} from '@nestjs/swagger';
 
-// 'board/:boardId/members' 경로에서 멤버 관련 API 요청을 처리하는 컨트롤러
-@ApiTags('멤버CRUD')
+/**
+ * 멤버 관련 API 컨트롤러
+ * - 특정 보드(board)에 대한 멤버 관리 기능 제공
+ * - 기본 경로: `/board/:boardId/members`
+ */
+@ApiTags('멤버') // Swagger에서 '멤버' 그룹으로 표시
 @Controller('board/:boardId/members')
 export class MemberController {
+  /**
+   * 생성자
+   * - `MemberService`를 주입받아 멤버 관련 로직 처리
+   */
   constructor(private readonly memberService: MemberService) {}
 
   /**
-   * 특정 보드에 속한 모든 멤버를 조회하는 API
-   * @ param boardId - 조회할 보드의 ID (URL에서 가져옴)
+   * 특정 보드에 속한 모든 멤버 조회 API
+   * - `GET /board/:boardId/members`
+   * - 특정 보드에 등록된 모든 멤버를 조회
+   *
+   * @ param boardId - 조회할 보드 ID (URL에서 `:boardId` 값으로 전달됨)
+   * @ returns 해당 보드에 속한 멤버 목록과 메시지
    */
-  @ApiOperation({ summary: '전체 멤버 조회' })
+  @ApiOperation({
+    summary: '멤버 목록 조회',
+    description: '특정 보드의 모든 멤버를 조회합니다.',
+  })
+  @ApiParam({ name: 'boardId', example: 1, description: '조회할 보드 ID' })
+  @ApiResponse({ status: 200, description: '멤버 조회 성공' })
   @Get()
   findAll(@Param('boardId') boardId: number) {
     return this.memberService.findAll(boardId);
   }
 
   /**
-   * 특정 보드 내에서 특정 멤버를 조회하는 API
-   * @ param boardId - 멤버가 속한 보드의 ID (URL에서 가져옴)
-   * @ param memberId - 조회할 멤버의 ID (URL에서 가져옴)
+   * 📌 특정 보드 내 특정 멤버 상세 조회 API (추가됨)
+   * - `GET /board/:boardId/members/:memberId`
    */
-  @ApiOperation({ summary: '특정 멤버 조회' })
+  @ApiOperation({
+    summary: '멤버 상세 조회',
+    description: '특정 보드 내 특정 멤버의 상세 정보를 조회합니다.',
+  })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer 토큰을 입력하세요',
+    required: true,
+  })
+  @ApiParam({ name: 'boardId', example: 1, description: '보드 ID' })
+  @ApiParam({ name: 'memberId', example: 2, description: '조회할 멤버 ID' })
+  @ApiResponse({ status: 200, description: '멤버 상세 조회 성공' })
+  @ApiResponse({ status: 404, description: '해당 멤버가 존재하지 않습니다.' })
   @Get(':memberId')
   findOne(
     @Param('boardId') boardId: number,
     @Param('memberId') memberId: number,
+    @Headers('authorization') authorization: string,
   ) {
-    return this.memberService.findOne(boardId, memberId);
+    return this.memberService.findOne(boardId, memberId, authorization);
   }
 
   /**
-   * 특정 보드에 멤버를 추가하는 API
-   * @ param boardId - 멤버를 추가할 보드의 ID (URL에서 가져옴)
-   * @ param createMemberDto - { userId } (Body에서 유저 ID를 받음)
+   * 특정 보드에 멤버 추가 API
+   *  - `POST /board/:boardId/members`
+   * - `Authorization` 헤더에서 JWT 토큰을 받아 인증된 사용자만 실행 가능
+   *
+   * @ param boardId - 멤버를 추가할 보드 ID (URL에서 전달됨)
+   * @ param createMemberDto - 추가할 멤버 정보 (Body에서 전달됨)
+   * @ param authorization - 요청자의 JWT 토큰 (`Authorization` 헤더에서 전달됨)
+   * @ returns 성공 메시지
    */
-  @ApiOperation({ summary: '멤버 추가' })
+  @ApiOperation({
+    summary: '멤버 추가',
+    description: '특정 보드에 멤버를 추가합니다.',
+  })
+  @ApiBearerAuth() // JWT 인증 필요
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer 토큰을 입력하세요',
+    required: true,
+  })
+  @ApiParam({
+    name: 'boardId',
+    example: 1,
+    description: '멤버를 추가할 보드 ID',
+  })
+  @ApiBody({ type: CreateMemberDto })
+  @ApiResponse({ status: 201, description: '멤버가 추가되었습니다!' })
+  @ApiResponse({ status: 404, description: '보드 또는 사용자 없음' })
   @Post()
   create(
-    @Param('boardId') boardId: number,
-    @Body() createMemberDto: CreateMemberDto,
+    @Param('boardId') boardId: number, // URL에서 보드 ID 가져옴
+    @Body() createMemberDto: CreateMemberDto, // Body에서 요청 데이터 가져옴
+    @Headers('authorization') authorization: string, // 헤더에서 JWT 토큰 가져옴
   ) {
-    return this.memberService.create(boardId, createMemberDto);
+    return this.memberService.create(boardId, createMemberDto, authorization);
   }
 
   /**
-   * 특정 보드에서 특정 멤버를 삭제하는 API
-   * @ param boardId - 멤버가 속한 보드의 ID (URL에서 가져옴)
-   * @ param memberId - 삭제할 멤버의 ID (URL에서 가져옴)
+   * 특정 보드에서 멤버 삭제 API
+   * - `DELETE /board/:boardId/members/:memberId`
+   * - `Authorization` 헤더에서 JWT 토큰을 받아 인증된 사용자만 실행 가능
+   *
+   * @ param boardId - 멤버가 속한 보드 ID (URL에서 전달됨)
+   * @ param memberId - 삭제할 멤버의 ID (URL에서 전달됨)
+   * @ param authorization - 요청자의 JWT 토큰 (`Authorization` 헤더에서 전달됨)
+   * @ returns 성공 메시지
    */
-  @ApiOperation({ summary: '멤버 삭제' })
+  @ApiOperation({
+    summary: '멤버 삭제',
+    description: '특정 보드에서 멤버를 삭제합니다.',
+  })
+  @ApiBearerAuth() // JWT 인증 필요
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer 토큰을 입력하세요',
+    required: true,
+  })
+  @ApiParam({ name: 'boardId', example: 1, description: '보드 ID' })
+  @ApiParam({ name: 'memberId', example: 2, description: '삭제할 멤버 ID' })
+  @ApiResponse({ status: 200, description: '멤버 삭제 성공' })
+  @ApiResponse({ status: 404, description: '해당 멤버가 존재하지 않습니다.' })
   @Delete(':memberId')
   delete(
-    @Param('boardId') boardId: number,
-    @Param('memberId') memberId: number,
+    @Param('boardId') boardId: number, // URL에서 보드 ID 가져옴
+    @Param('memberId') memberId: number, // URL에서 멤버 ID 가져옴
+    @Headers('authorization') authorization: string, // 헤더에서 JWT 토큰 가져옴
   ) {
-    return this.memberService.delete(boardId, memberId);
+    return this.memberService.delete(boardId, memberId, authorization);
   }
 }
