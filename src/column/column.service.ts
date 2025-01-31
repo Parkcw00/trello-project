@@ -73,7 +73,7 @@ export class ColumnService { // 서비스 클래스
                 .update(ColumnEntity) // 컬럼 엔티티를 업데이트
                 .where("columnPosition < :nowCurrentPosition AND columnPosition >= :newPosition", { nowCurrentPosition, newPosition }) // 현재 위치보다 작고 새로운 위치보다 크거나 같은 컬럼들을 조회
                 .set({ columnPosition: () => "columnPosition + 1" }) // 컬럼 포지션을 뒤로 이동
-                .execute(); // 쿼리빌더를 사용해서 쿼리 실행11
+                .execute(); // 쿼리빌더를 사용해서 쿼리 실행
         }
     }
     // 변경된 컬럼의 위치 업데이트
