@@ -13,6 +13,7 @@ import { CardModule } from './card/card.module';
 import { AlarmModule } from './alarm/alarm.module';
 import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
+import { FileModule } from './file/file.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -54,6 +55,7 @@ const typeOrmModuleOptions = {
     MemberModule,
     AlarmModule,
     CardModule,
+    FileModule,
   ],
   controllers: [],
   providers: [],
