@@ -4,3 +4,6 @@ export class UpdateUserDto {
   password: string;
   newPassword: string;
 }
+
+// @is타입
+// @is컬럼명
