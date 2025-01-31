@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
+export class UpdateUserDto {
+  name: string;
+  email: string;
+  password: string;
+  newPassword: string;
+}
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+// @is타입
+// @is컬럼명

@@ -10,4 +10,3 @@ import { ColumnController } from './column.controller'; // 컨트롤러 가져�
   providers: [ColumnService], // 서비스 등록
 })
 export class ColumnModule {}
-
