@@ -52,7 +52,7 @@ export class CardController {
     @Param('cardId', ParseIntPipe) cardId: number,
     @Body() updateCardDto: UpdateCardDto,
   ): Promise<Card> {
-    return this.cardService.updateCard(columnId, cardId, updateCardDto);
+    return this.cardService.updateCard(cardId, columnId, updateCardDto);
   }
 
   @ApiOperation({ summary: '카드 삭제' })
