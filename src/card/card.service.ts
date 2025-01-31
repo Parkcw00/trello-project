@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
+import _ from 'lodash';
 
 // 카드가 만들어지는데에 필요한 정보를 정해준다
 // 타입 orm을 써서 DB에 저장한다 (받아온 정보로 카드를 만든다)
@@ -20,23 +21,49 @@ export class CardService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
   ) {}
-  async createCard(columnId: number, createCardDto: CreateCardDto) {
+  async createCard(
+    columnId: number,
+    createCardDto: CreateCardDto,
+  ): Promise<Card> {
     return await this.cardRepository.save({ columnId, ...createCardDto });
   }
 
-  findAll() {
-    return `This action returns all card`;
+  async findCards(columnId: number): Promise<Card[]> {
+    return await this.cardRepository.find({
+      where: { columnId },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} card`;
+  async findCard(columnId: number, cardId: number): Promise<Card> {
+    const card = await this.cardRepository.findOne({
+      where: { id: cardId, columnId },
+    });
+    if (!card) {
+      throw new BadRequestException('카드가 존재하지 않습니다.');
+    }
+
+    return card;
   }
 
-  update(id: number, updateCardDto: UpdateCardDto) {
-    return `This action updates a #${id} card`;
+  async updateCard(
+    cardId: number,
+    columnId: number,
+    updateCardDto: UpdateCardDto,
+  ): Promise<Card> {
+    await this.cardRepository.update({ id: cardId, columnId }, updateCardDto);
+    return await this.cardRepository.findOne({
+      where: { id: cardId, columnId },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} card`;
+  async deleteCard(cardId: number, columnId: number): Promise<void> {
+    const result = await this.cardRepository.delete({
+      id: cardId,
+      columnId,
+    });
+
+    if (result.affected === 0) {
+      throw new BadRequestException('카드를 찾지 못했습니다.');
+    }
   }
 }
