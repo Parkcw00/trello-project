@@ -28,13 +28,13 @@ export class Card {
   @Column({ type: 'text', nullable: false }) // 컬럼 데코레이터 사용
   content: string; // 타입 지정 ( 숫자 타입 )
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   attachtment: string;
 
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date;
 
-  @Column({ type: 'bigint', nullable: true })
+  @Column({ type: 'bigint', nullable: false })
   cardPosition: number;
 
   @CreateDateColumn({ type: 'timestamp' })
