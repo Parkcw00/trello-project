@@ -4,8 +4,9 @@ import { IsNumber, IsNotEmpty } from 'class-validator'; // 데코레이터 가�
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateColumnDto extends PartialType(CreateColumnDto) {
-    @ApiProperty({ example: 1 })
-    @IsNumber()// 데코레이터 사용 ( 숫자 타입 )
-    @IsNotEmpty({ message: '이동시킬 포지션을 입력해주세요.'}) // 데코레이터 사용 ( 비어있지 않은 숫자 타입 )
-    columnPosition: number;
+    @IsNotEmpty()
+    id: number;
+
+    @IsNotEmpty()
+    targetColumnId: number;
 }
