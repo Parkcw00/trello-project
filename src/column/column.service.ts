@@ -10,7 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm'; // 리포지토리 의존성
 export class ColumnService { // 서비스 클래스
   constructor( // 인스턴스를 생성할때 쓰이는 메서드
     @InjectRepository(ColumnEntity) // 리포지토리 의존성 주입
-    private columnRepository: Repository<ColumnEntity> // 리포지토리 인스턴스 생성
+    private columnRepository: Repository<ColumnEntity>, // 리포지토리 인스턴스 생성
+    // private swapPositionService: swapPositionService // 스왑 위치 서비스 의존성 주입
   ) {} // 생성자 메서드
   
   async getMaxColumnPosition(boardId: number): Promise<number> {// 컬럼 최대 위치 조회 메서드
