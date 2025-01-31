@@ -10,6 +10,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Board } from 'src/board/entities/board.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ConflictException } from '@nestjs/common'; // 중복 예외 처리 추가
 
 /**
  * 멤버 서비스 클래스
@@ -127,9 +128,8 @@ export class MemberService {
     createMemberDto: CreateMemberDto,
     authorization: string,
   ): Promise<{ message: string }> {
-    const userId = this.verifyToken(authorization); // 요청한 사용자의 ID 추출
+    const userId = this.verifyToken(authorization); // JWT 검증
 
-    // 보드가 존재하는지 확인
     const board = await this.boardRepository.findOne({
       where: { id: boardId },
     });
@@ -139,7 +139,6 @@ export class MemberService {
       });
     }
 
-    // 추가할 멤버가 실제 유저인지 확인
     const user = await this.userRepository.findOne({
       where: { id: createMemberDto.userId },
     });
@@ -147,7 +146,17 @@ export class MemberService {
       throw new NotFoundException({ message: '회원이 존재하지 않습니다.' });
     }
 
-    // 새로운 멤버 생성 및 저장
+    // ✅ 중복 체크 추가 (해당 보드에 같은 userId가 있는지 확인)
+    const existingMember = await this.memberRepository.findOne({
+      where: { boardId, userId: createMemberDto.userId },
+    });
+
+    if (existingMember) {
+      throw new ConflictException({
+        message: '이미 이 보드에 추가된 멤버입니다.',
+      });
+    }
+
     const newMember = this.memberRepository.create({
       board,
       user,

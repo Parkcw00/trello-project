@@ -54,7 +54,7 @@ export class MemberController {
   }
 
   /**
-   * 📌 특정 보드 내 특정 멤버 상세 조회 API (추가됨)
+   * 특정 보드 내 특정 멤버 상세 조회 API (추가됨)
    * - `GET /board/:boardId/members/:memberId`
    */
   @ApiOperation({
@@ -81,20 +81,17 @@ export class MemberController {
   }
 
   /**
-   * 특정 보드에 멤버 추가 API
-   *  - `POST /board/:boardId/members`
+   * 특정 보드에 멤버 추가 API (중복 방지 기능 추가됨)
+   * - `POST /board/:boardId/members`
    * - `Authorization` 헤더에서 JWT 토큰을 받아 인증된 사용자만 실행 가능
-   *
-   * @ param boardId - 멤버를 추가할 보드 ID (URL에서 전달됨)
-   * @ param createMemberDto - 추가할 멤버 정보 (Body에서 전달됨)
-   * @ param authorization - 요청자의 JWT 토큰 (`Authorization` 헤더에서 전달됨)
-   * @ returns 성공 메시지
+   * - 이미 추가된 `userId`가 있으면 `409 Conflict` 에러 발생
    */
   @ApiOperation({
-    summary: '멤버 추가',
-    description: '특정 보드에 멤버를 추가합니다.',
+    summary: '멤버 추가 (중복 방지)',
+    description:
+      '특정 보드에 멤버를 추가합니다. 동일한 userId는 중복 추가 불가.',
   })
-  @ApiBearerAuth() // JWT 인증 필요
+  @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
     description: 'Bearer 토큰을 입력하세요',
@@ -107,6 +104,10 @@ export class MemberController {
   })
   @ApiBody({ type: CreateMemberDto })
   @ApiResponse({ status: 201, description: '멤버가 추가되었습니다!' })
+  @ApiResponse({
+    status: 409,
+    description: '이미 이 보드에 추가된 멤버입니다.',
+  }) // 🔹 중복 방지 설명 추가
   @ApiResponse({ status: 404, description: '보드 또는 사용자 없음' })
   @Post()
   create(
