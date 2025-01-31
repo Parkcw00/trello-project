@@ -1,4 +1,4 @@
-import { Controller,  Headers, Get, Post, Body,Req, Patch, Param, Delete } from '@nestjs/common';
+import { Controller,  Headers, Get, Post, Body,Req, Patch, Param, Delete,BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import{CreateUserDto}from './dto/create-user.dto'
 import{LoginUserDto}from './dto/login-user.dto'
@@ -59,6 +59,7 @@ async updateUser(@Body() updateUserDto: UpdateUserDto,@Headers('authorization') 
 
 @Delete('me')
 async deleteUser(@Body() deleteUserDto:DeleteUserDto,@Headers('authorization') authorization: string) {
-  return this.userService.remove(deleteUserDto, authorization);
+  await this.userService.remove(deleteUserDto, authorization);
+  return { message: '댓글이 삭제되었습니다' };
 }
 }

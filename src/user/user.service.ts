@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Repository } from 'typeorm';
-import {Controller, Get, Headers,
+import {BadRequestException,Controller, Get, Headers,
   ConflictException, Injectable, NotFoundException, UnauthorizedException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -230,10 +230,13 @@ async update( updateUserDto: UpdateUserDto, authorization:string) {
     throw new NotFoundException(`토큰오류.`);
   }
       // 비번 비교
-      if (deleteUserDto.password !==myInfo.password) {
+  if (deleteUserDto.password !==myInfo.password) {
         throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+ 
+      const result = await this.userRepository.softDelete({ id: myId }); 
+      if (result.affected === 0) {
+    throw new BadRequestException('회원을 찾지 못했습니다.');
       }
-  
-  return  this.userRepository.softDelete({ id: myId });
   }
 }
