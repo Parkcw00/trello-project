@@ -4,6 +4,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
+import { LexoRank } from 'lexorank';
 import _ from 'lodash';
 
 // 카드가 만들어지는데에 필요한 정보를 정해준다
@@ -21,11 +22,23 @@ export class CardService {
     @InjectRepository(Card)
     private cardRepository: Repository<Card>,
   ) {}
-  async createCard(
-    columnId: number,
-    createCardDto: CreateCardDto,
-  ): Promise<Card> {
-    return await this.cardRepository.save({ columnId, ...createCardDto });
+  async createCard(columnId: number, createCardDto: CreateCardDto) {
+    let lexoRank: LexoRank;
+    const existingCard = await this.cardRepository.findOne({ where: {}, order: { lexo: "DESC" } })
+    if (existingCard && existingCard.lexo) {
+      lexoRank = LexoRank.parse(existingCard.lexo.toString()).genNext();
+    } else {
+      lexoRank = LexoRank.middle();
+    }
+  
+    const newCard: Card = this.cardRepository.create({
+      title: createCardDto.title,
+      content: createCardDto.content,
+      lexo: lexoRank.toString()
+    });
+  
+    const savedCard = await this.cardRepository.save(newCard);
+    return savedCard;
   }
 
   async findCards(columnId: number): Promise<Card[]> {
