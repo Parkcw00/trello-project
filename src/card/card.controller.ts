@@ -46,13 +46,14 @@ export class CardController {
   }
 
   @ApiOperation({ summary: '카드 수정' })
-  @Patch(':cardId')
+  @Patch(':cardId/:targetCardId')
   update(
     @Param('columnId', ParseIntPipe) columnId: number,
     @Param('cardId', ParseIntPipe) cardId: number,
-    @Body() updateCardDto: UpdateCardDto,
+    @Param('targetCardId', ParseIntPipe) targetCardId: number,
+    // @Body() updateCardDto: UpdateCardDto,
   ): Promise<Card> {
-    return this.cardService.updateCard(columnId, cardId, updateCardDto);
+    return this.cardService.updateCardOrder(columnId, cardId, targetCardId);
   }
 
   @ApiOperation({ summary: '카드 삭제' })

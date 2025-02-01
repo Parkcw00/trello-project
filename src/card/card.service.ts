@@ -34,7 +34,9 @@ export class CardService {
     const newCard: Card = this.cardRepository.create({
       title: createCardDto.title,
       content: createCardDto.content,
-      lexo: lexoRank.toString()
+      memberId: createCardDto.memberId,
+      lexo: lexoRank.toString(),
+      columnId: columnId,
     });
   
     const savedCard = await this.cardRepository.save(newCard);
@@ -58,15 +60,39 @@ export class CardService {
     return card;
   }
 
-  async updateCard(
-    cardId: number,
-    columnId: number,
-    updateCardDto: UpdateCardDto,
-  ): Promise<Card> {
-    await this.cardRepository.update({ id: cardId, columnId }, updateCardDto);
-    return await this.cardRepository.findOne({
-      where: { id: cardId, columnId },
-    });
+  async updateCardOrder(columnId: number,cardId: number, targetCardId: number): Promise<Card> {
+    const cards = await this.cardRepository.find({ where: { columnId }, order: { lexo: "DESC" } });
+    console.log(`--------------------> 카드 리스트`,cards);
+    const card = await this.cardRepository.findOne({ where: { id: cardId } });
+    const targetCard = await this.cardRepository.findOne({ where: { id: targetCardId } });
+    console.log(`--------------------> 타켓 카드`,targetCard);
+    const targetCardIndex = cards.findIndex(card => card.id === targetCardId);
+    console.log(`--------------------> 타켓 카드 인덱스`,targetCardIndex);
+    const targetNextCardIndex = targetCardIndex - 1;
+    console.log(`--------------------> 타켓 다음 카드 인덱스`,targetNextCardIndex);
+    // const existingCard = await this.cardRepository.findOne({ where: { id: targetCardId }, order: { lexo: "DESC" } })
+
+    if (!card || !targetCard) {
+      throw new BadRequestException('카드가 존재하지 않습니다.');
+    }
+
+    const currentRank = LexoRank.parse(card.lexo);
+    console.log(`--------------------> 현재 카드 랭크`,currentRank);
+    const targetRank = LexoRank.parse(targetCard.lexo);
+    console.log(`--------------------> 타켓 카드 랭크`,targetRank);
+    const targetNextCard = cards[targetNextCardIndex];
+    console.log(`--------------------> 타켓 다음 카드`,targetNextCard);
+    if(targetNextCardIndex < 0) {
+      let lexoRank: LexoRank;
+      lexoRank = LexoRank.parse(card.lexo.toString()).genNext(); // 현재 카드 다음 랭크
+    } else {
+      const newRank = LexoRank.parse(targetNextCard.lexo).between(targetRank); // 현재 카드와 타켓 카드 사이의 랭크
+      card.lexo = newRank.toString();
+    }
+    // 카드의 순서 업데이트
+    await this.cardRepository.save(card);
+
+    return card;
   }
 
   async deleteCard(cardId: number, columnId: number): Promise<void> {
