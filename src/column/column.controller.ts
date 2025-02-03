@@ -7,6 +7,7 @@ import { ColumnService } from './column.service'; // 서비스 가져오기
 import { CreateColumnDto } from './dto/create-column.dto'; // 생성 DTO 가져오기
 import { UpdateColumnDto } from './dto/update-column.dto'; // 업데이트 DTO 가져오기
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ColumnEntity } from './entities/column.entity';
 
 @ApiTags('컬럼CRUD')
 @Controller('column') // 컨트롤러 데코레이터 사용
@@ -33,9 +34,13 @@ export class ColumnController { // 컨트롤러 클래스
 
   // @Roles(Role.Admin) // 권한 데코레이터를 사용해서 컴럼 이동이 가능한 권한을 가진 사용자만 접근 가능하도록 설정
   @ApiOperation({ summary: '컬럼 업데이트' })
-  @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateColumnDto: UpdateColumnDto) { // 컬럼 업데이트 메서드
-    return this.columnService.update(id, updateColumnDto); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 업데이트
+  @Patch(':boardId/:columnId/:targetColumnId')
+  update(
+    @Param('boardId', ParseIntPipe) boardId: number, 
+    @Param('columnId', ParseIntPipe) columnId: number,
+    @Param('targetColumnId', ParseIntPipe) targetColumnId: number,
+  ): Promise<ColumnEntity> {
+    return this.columnService.updateColumnOrder(boardId, columnId, targetColumnId); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 업데이트
   }
 
   // @Roles(Role.Admin) // 권한 데코레이터를 사용해서 컴럼 삭제가 가능한 권한을 가진 사용자만 접근 가능하도록 설정
