@@ -80,7 +80,7 @@ export class FileService {
         cardId: +cardId,
         fileName: file.filename,
       });
-      return `${file.filename} 파일이 업로드 되었습니다.`;
+      return {message: `${file.filename} 파일이 업로드 되었습니다.`};
     } catch (error) {
       await this.deleteUploadedFile(file.path);
       throw new BadRequestException('파일 업로드 중 오류가 발생했습니다.');
@@ -129,7 +129,7 @@ export class FileService {
         fileName,
       });
       await this.deleteUploadedFile(`uploads/${fileName}`);
-      return `${fileName} 파일이 삭제되었습니다.`;
+      return {message: `${fileName} 파일이 삭제되었습니다.`};
     } catch (error) {
       throw new BadRequestException('파일 삭제 중 오류가 발생했습니다.');
     }
