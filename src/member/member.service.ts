@@ -21,26 +21,26 @@ import { ConflictException } from '@nestjs/common'; // 중복 예외 처리 추�
 @Injectable()
 export class MemberService {
   /**
-   * 생성자 (Dependency Injection)
+   * 생성자 (의존성 주입)
    * - `Repository<Member>`: 멤버 테이블 조작을 위한 TypeORM Repository
    * - `Repository<User>`: 사용자 테이블 조작을 위한 TypeORM Repository
    * - `Repository<Board>`: 보드 테이블 조작을 위한 TypeORM Repository
-   * - `JwtService`: JWT 인증 및 토큰 검증을 수행
+   * - `JwtService`: JWT 인증 및 토큰 검증 수행
    */
   constructor(
     @InjectRepository(Member) private memberRepository: Repository<Member>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Board) private boardRepository: Repository<Board>,
-    private jwtService: JwtService, // JWT 검증을 위한 서비스 , JwtService 주입
+    private jwtService: JwtService, // JWT 인증 관련 서비스
   ) {}
 
   /**
    * JWT 토큰을 검증하고 사용자 ID를 반환하는 메서드
-   * - Authorization 헤더에서 JWT 토큰을 추출하고 검증함
+   * - Authorization 헤더에서 JWT 토큰을 추출하고 검증
    * - 검증이 성공하면 `userId` 반환, 실패하면 예외 발생
    *
-   * @ param authorization - HTTP 요청 헤더에서 전달된 JWT 토큰
-   * @ returns number - JWT에서 추출된 사용자 ID
+   * @param authorization - HTTP 요청 헤더에서 전달된 JWT 토큰
+   * @returns number - JWT에서 추출된 사용자 ID
    */
   private verifyToken(authorization: string): number {
     if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -59,15 +59,14 @@ export class MemberService {
 
   /**
    * 특정 보드의 모든 멤버 조회
-   * - 해당 보드에 등록된 모든 멤버 목록을 반환함
+   * - 해당 보드에 등록된 모든 멤버 목록을 반환
    *
-   * @param boardId - 조회할 보드 ID
-   * @returns { message: string; members: Member[] } - 멤버 목록과 성공 메시지 반환
+   * @ param boardId - 조회할 보드 ID
+   * @ returns 멤버 목록과 성공 메시지 반환
    */
   async findAll(
     boardId: number,
   ): Promise<{ message: string; members: Member[] }> {
-    // 보드가 존재하는지 확인
     const board = await this.boardRepository.findOne({
       where: { id: boardId },
     });
@@ -88,18 +87,17 @@ export class MemberService {
 
   /**
    * 특정 보드에서 특정 멤버 조회
-   * - 해당 보드에서 특정 멤버의 상세 정보를 조회함
    *
    * @ param boardId - 보드 ID
    * @ param memberId - 조회할 멤버 ID
-   * @ returns { message: string; member: Member } - 특정 멤버 정보 반환
+   * @ param authorization - JWT 토큰
+   * @ returns 특정 멤버 정보 반환
    */
   async findOne(
     boardId: number,
     memberId: number,
-    authorization: string, // 🔹 Authorization 추가
+    authorization: string,
   ): Promise<{ message: string; member: Member }> {
-    // 특정 보드 내 특정 멤버를 조회 (user 정보 포함)
     const member = await this.memberRepository.findOne({
       where: { id: memberId, boardId },
       relations: ['user'],
@@ -116,13 +114,13 @@ export class MemberService {
 
   /**
    * 특정 보드에 멤버 추가
-   * - 사용자가 보드에 새로운 멤버를 추가할 수 있음
-   * - `Authorization` 헤더에서 JWT 토큰을 검증하고 추가 진행
+   * - `Authorization` 헤더에서 JWT 토큰을 검증 후 추가 진행
+   * - 중복된 userId 추가 방지
    *
    * @ param boardId - 멤버를 추가할 보드 ID
    * @ param createMemberDto - 추가할 멤버 정보 (userId 필수)
-   * @ param authorization - 요청자의 JWT 토큰
-   * @ returns { message: string } - 성공 메시지 반환
+   * @ param authorization - JWT 토큰
+   * @ returns 성공 메시지 반환
    */
   async create(
     boardId: number,
@@ -147,7 +145,7 @@ export class MemberService {
       throw new NotFoundException({ message: '회원이 존재하지 않습니다.' });
     }
 
-    // ✅ 중복 체크 추가 (해당 보드에 같은 userId가 있는지 확인)
+    // 중복 체크 (해당 보드에 같은 userId가 있는지 확인)
     const existingMember = await this.memberRepository.findOne({
       where: { boardId, userId: createMemberDto.userId },
     });
@@ -171,13 +169,13 @@ export class MemberService {
 
   /**
    * 특정 보드에서 멤버 삭제
-   * - 보드에서 특정 멤버를 삭제할 수 있음
-   * - `Authorization` 헤더에서 JWT 토큰을 검증하고 삭제 진행
+   * - JWT 토큰을 검증하고 삭제 수행
+   * - 본인만 삭제 가능
    *
    * @ param boardId - 보드 ID
    * @ param memberId - 삭제할 멤버 ID
-   * @ param authorization - 요청자의 JWT 토큰
-   * @ returns { message: string } - 성공 메시지 반환
+   * @ param authorization - JWT 토큰
+   * @ returns 성공 메시지 반환
    */
   async delete(
     boardId: number,
