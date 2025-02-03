@@ -91,6 +91,7 @@ logout() {
 
 //GET	회원 정보 조회	/user/:userId
 async findOne(userId:number, authorization:string) {
+  console.log(`1111111111111111`,authorization);
     if (!authorization) {
       throw new UnauthorizedException('JWT 토큰이 필요합니다.');
     }
