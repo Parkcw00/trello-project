@@ -16,6 +16,8 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from './entities/card.entity';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { UserInfo } from 'src/utils/userInfo.decorator';
+import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('카드CRUD')
 @ApiBearerAuth()
@@ -27,52 +29,57 @@ export class CardController {
   @ApiOperation({ summary: '카드 생성' })
   @Post()
   createCard(
-    @Req() req: Request,
+    @UserInfo() user: User,
     @Param('columnId', ParseIntPipe) columnId: number,
     @Body() createCardDto: CreateCardDto,
   ): Promise<Card> {
-    return this.cardService.createCard(columnId, createCardDto);
+    return this.cardService.createCard(user.id, columnId, createCardDto);
   }
 
   @ApiOperation({ summary: '전체 카드 조회' })
   @Get()
   findCards(
-    @Req() req: Request,
+    @UserInfo() user: User,
     @Param('columnId', ParseIntPipe) columnId: number,
   ): Promise<Card[]> {
-    return this.cardService.findCards(columnId);
+    return this.cardService.findCards(user.id, columnId);
   }
 
   @ApiOperation({ summary: '카드 상세 조회' })
   @Get(':cardId')
   findCard(
-    @Req() req: Request,
+    @UserInfo() user: User,
     @Param('columnId', ParseIntPipe) columnId: number,
     @Param('cardId', ParseIntPipe) cardId: number,
   ): Promise<Card> {
-    return this.cardService.findCard(columnId, cardId);
+    return this.cardService.findCard(user.id, columnId, cardId);
   }
 
   @ApiOperation({ summary: '카드 수정' })
   @Patch(':cardId/:targetCardId')
   update(
-    @Req() req: Request,
+    @UserInfo() user: User,
     @Param('columnId', ParseIntPipe) columnId: number,
     @Param('cardId', ParseIntPipe) cardId: number,
     @Param('targetCardId', ParseIntPipe) targetCardId: number,
     // @Body() updateCardDto: UpdateCardDto,
   ): Promise<Card> {
-    return this.cardService.updateCardOrder(columnId, cardId, targetCardId);
+    return this.cardService.updateCardOrder(
+      user.id,
+      columnId,
+      cardId,
+      targetCardId,
+    );
   }
 
   @ApiOperation({ summary: '카드 삭제' })
   @Delete(':cardId')
   async deleteCard(
-    @Req() req: Request,
+    @UserInfo() user: User,
     @Param('columnId', ParseIntPipe) columnId: number,
     @Param('cardId', ParseIntPipe) cardId: number,
   ): Promise<{ message: string }> {
-    await this.cardService.deleteCard(cardId, columnId);
+    await this.cardService.deleteCard(user.id, cardId, columnId);
     return { message: '카드가 삭제되었습니다' };
   }
 }

@@ -1,11 +1,7 @@
 import { PickType } from '@nestjs/mapped-types';
 import { Card } from '../entities/card.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateCardDto extends PickType(Card, [
   'title',
@@ -20,9 +16,4 @@ export class CreateCardDto extends PickType(Card, [
   @IsNotEmpty()
   @IsString()
   content: string;
-
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  memberId: number;
 }

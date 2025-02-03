@@ -28,7 +28,7 @@ const typeOrmModuleOptions = {
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
     entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록
-    synchronize: true,
+    synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
   inject: [ConfigService],

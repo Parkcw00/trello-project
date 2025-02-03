@@ -21,7 +21,6 @@ async function bootstrap() {
     .addServer('https://production.yourapi.com/', 'Production')
     .addBearerAuth()
     .addTag('Your API Tag')
-    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
@@ -32,4 +31,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
