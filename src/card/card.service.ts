@@ -86,7 +86,6 @@ export class CardService {
     if (targetCardIndex < CardIndex) {
       const targetNextCardIndex = targetCardIndex - 1;
 
-      // const existingCard = await this.cardRepository.findOne({ where: { id: targetCardId }, order: { lexo: "DESC" } })
 
       if (!card || !targetCard) {
         throw new BadRequestException('카드가 존재하지 않습니다.');
