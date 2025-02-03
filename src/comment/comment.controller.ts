@@ -7,67 +7,69 @@ import {
   Param,
   Delete,
   ParseIntPipe,
-  Headers,
   UseGuards,
-} from '@nestjs/common'; // 컨트롤러 데코레이터 가져오기
+} from '@nestjs/common';
 import { Comment } from './entities/comment.entity';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { JwtService } from '@nestjs/jwt';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserInfo } from 'src/utils/userInfo.decorator';
+import { User } from 'src/user/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 @ApiTags('댓글CRUD')
 @Controller('cards/:cardId/comments')
 export class CommentController {
-  constructor(
-    private readonly commentService: CommentService,
-    private jwtService: JwtService,
-  ) {}
-  // @UseGuards(RolesGuard) // 권한 검증 가져오기 ( 보통 여기서 검증을 진행 )
-  @UseGuards(AuthGuard('jwt'))
+  constructor(private readonly commentService: CommentService) {}
+
   @ApiOperation({ summary: '댓글 생성' })
   @Post()
-  createComment(
-    @Headers('authorization') authorization: string,
+  async createComment(
+    @UserInfo() user: User,
     @Param('cardId', ParseIntPipe) cardId: number,
-    @Body() CreateCommentDto: CreateCommentDto,
+    @Body() createCommentDto: CreateCommentDto,
   ): Promise<Comment> {
-    return this.commentService.createComment(
-      authorization,
+    return await this.commentService.createComment(
+      user.id,
+      createCommentDto,
       cardId,
-      CreateCommentDto,
     );
   }
 
   @ApiOperation({ summary: '전체 댓글 조회' })
   @Get()
-  findComments(
+  async findComments(
     @Param('cardId', ParseIntPipe) cardId: number,
+    @UserInfo() user: User, // 사용자 정보를 통해 권한 체크
   ): Promise<Comment[]> {
-    return this.commentService.findComments(cardId);
+    return await this.commentService.findComments(cardId, user.id);
   }
 
   @ApiOperation({ summary: '댓글 상세 조회' })
   @Get(':commentId')
-  findComment(
+  async findComment(
     @Param('cardId', ParseIntPipe) cardId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
+    @UserInfo() user: User,
   ): Promise<Comment> {
-    return this.commentService.findComment(cardId, commentId);
+    return await this.commentService.findComment(cardId, commentId, user.id);
   }
 
   @ApiOperation({ summary: '댓글 수정' })
   @Patch(':commentId')
-  updateComment(
+  async updateComment(
     @Param('cardId', ParseIntPipe) cardId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
+    @UserInfo() user: User,
     @Body() updateCommentDto: UpdateCommentDto,
   ): Promise<Comment> {
-    return this.commentService.updateComment(
+    return await this.commentService.updateComment(
       cardId,
       commentId,
+      user.id,
       updateCommentDto,
     );
   }
@@ -77,8 +79,9 @@ export class CommentController {
   async deleteComment(
     @Param('cardId', ParseIntPipe) cardId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
+    @UserInfo() user: User,
   ): Promise<{ message: string }> {
-    await this.commentService.deleteComment(cardId, commentId);
+    await this.commentService.deleteComment(cardId, commentId, user.id);
     return { message: '댓글이 삭제되었습니다' };
   }
 }

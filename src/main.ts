@@ -13,6 +13,7 @@ async function bootstrap() {
   );
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
+    .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
     .addServer('http://localhost:3000/', 'Local environment')
