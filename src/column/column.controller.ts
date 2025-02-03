@@ -18,27 +18,35 @@ import { User } from 'src/user/entities/user.entity';
 export class ColumnController { // 컨트롤러 클래스
   constructor(private readonly columnService: ColumnService) {} // 생성자 메서드
 
-  // @UseGuards(RolesGuard) // 권한 검증 가져오기 ( 보통 여기서 검증을 진행 )
   @ApiOperation({ summary: '컬럼 생성' })
   @Post()
-  create(@Body() createColumnDto: CreateColumnDto, @UserInfo() user: User, ){ // 컬럼 생성 메서드 (바디에서 받은 데이터를 이용해서 생성 메서드를 만듬)
+  create(
+    @Body() createColumnDto: CreateColumnDto,
+    @UserInfo() user: User, ){ // 컬럼 생성 메서드 (바디에서 받은 데이터를 이용해서 생성 메서드를 만듬)
     return this.columnService.create(user.id, createColumnDto); // 컬럼 생성 메서드를 이용해서 컬럼 데이터를 생성
   }
 
-  @ApiOperation({ summary: '모든 컬럼 조회' })
-  @Get() // 모든 컬럼 조회 메서드
-  findAll() {
-    return this.columnService.findAll(); // 컬럼 서비스를 이용해서 모든 컬럼 데이터를 조회
+  @ApiOperation({ summary: '보드안에 있는 모든 컬럼 조회' })
+  @Get(':boardId') // 모든 컬럼 조회 메서드
+  findAll(
+    @UserInfo() user: User,
+    @Param('boardId', ParseIntPipe) boardId: number
+  ) {
+    return this.columnService.findAll(boardId, user.id); // 컬럼 서비스를 이용해서 모든 컬럼 데이터를 조회
   }
 
   @ApiOperation({ summary: '특정 컬럼 조회' })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) { // 특정 컬럼 조회 메서드
-    return this.columnService.findOne(id); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 조회
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @UserInfo() user: User, @Param('boardId', ParseIntPipe) boardId: number) { // 특정 컬럼 조회 메서드
+
+    return this.columnService.findOne(id, user.id, boardId); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 조회
   }
 
+
   // @Roles(Role.Admin) // 권한 데코레이터를 사용해서 컴럼 이동이 가능한 권한을 가진 사용자만 접근 가능하도록 설정
-  @ApiOperation({ summary: '컬럼 업데이트' })
+  @ApiOperation({ summary: '컬럼 순서 업데이트' })
   @Patch(':boardId/:columnId/:targetColumnId')
   update(
     @Param('boardId', ParseIntPipe) boardId: number, 
