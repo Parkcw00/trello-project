@@ -19,8 +19,8 @@ export class ColumnEntity {
   @Column({ type: 'varchar', nullable: false }) // 컬럼 데코레이터 사용 varchar 이건 문자열을 저장하는것.
   columnType: string; // 타입 지정 ( 문자열 타입 )
 
-  @Column({ type: 'float', nullable: false, unique: true }) // 컬럼 데코레이터 사용
-  columnPosition?: number; // 타입 지정 ( 숫자 타입 )
+  @Column({ type: 'varchar', nullable: true })
+  lexo: string;
 
   @ManyToOne(() => Board, (board) => board.columns) // 보드 엔티티와 n:1 관계 설정
   @JoinColumn({ name: 'board_id' }) // 보드 아이디를 조건으로 조회
