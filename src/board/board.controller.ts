@@ -10,20 +10,21 @@ import {
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { BoardDto } from './dto/board.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './../utils/userInfo.decorator';
 import { User } from 'src/user/entities/user.entity';
 
 @UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 @ApiTags('보드CRUD')
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
   @ApiOperation({ summary: '보드 상세조회' })
   @Get(':boardId') // 보드 상세조회
-  async getBoard(@Param('boardId') boardId: number) {
-    return await this.boardService.getBoard(boardId);
+  async getBoard(@UserInfo() user: User, @Param('boardId') boardId: number) {
+    return await this.boardService.getBoard(user.id, boardId);
   }
   @ApiOperation({ summary: '내 보드들 조회' })
   @Get() //내 보드들 조회
