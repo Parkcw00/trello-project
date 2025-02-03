@@ -7,25 +7,38 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Headers,
+  UseGuards,
 } from '@nestjs/common'; // 컨트롤러 데코레이터 가져오기
 import { Comment } from './entities/comment.entity';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('댓글CRUD')
 @Controller('cards/:cardId/comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly commentService: CommentService,
+    private jwtService: JwtService,
+  ) {}
   // @UseGuards(RolesGuard) // 권한 검증 가져오기 ( 보통 여기서 검증을 진행 )
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: '댓글 생성' })
   @Post()
   createComment(
+    @Headers('authorization') authorization: string,
     @Param('cardId', ParseIntPipe) cardId: number,
     @Body() CreateCommentDto: CreateCommentDto,
   ): Promise<Comment> {
-    return this.commentService.createComment(cardId, CreateCommentDto);
+    return this.commentService.createComment(
+      authorization,
+      cardId,
+      CreateCommentDto,
+    );
   }
 
   @ApiOperation({ summary: '전체 댓글 조회' })

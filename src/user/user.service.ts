@@ -1,25 +1,29 @@
 import _ from 'lodash';
 import { Repository } from 'typeorm';
-import {Controller, Get, Headers,
-  ConflictException, Injectable, NotFoundException, UnauthorizedException
+import {
+  Controller,
+  Get,
+  Headers,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import{CreateUserDto}from './dto/create-user.dto'
-import{LoginUserDto}from './dto/login-user.dto'
-import{UpdateUserDto}from './dto/update-user.dto'
-import{DeleteUserDto}from './dto/delete-user.dto'
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 import { User } from './entities/user.entity';
 
 // 비번 암호화해서 저장하기
-    /*
+/*
 // 비밀번호 해싱 유틸리티 함수
 private async hashPassword(password: string): Promise<string> {
   const saltRounds = 10; // bcrypt의 기본 설정
   return bcrypt.hash(password, saltRounds);}}
 */
-
-
 
 @Injectable()
 export class UserService {
@@ -28,11 +32,10 @@ export class UserService {
     private jwtService: JwtService, // JWT 토큰 생성을 위해 주입한 서비스
   ) {}
 
-
-//POST	회원가입	/user/signup
+  //POST	회원가입	/user/signup
   async create(createUserDto: CreateUserDto) {
     const existUser = await this.userRepository.findOne({
-      where:{email:createUserDto.email}
+      where: { email: createUserDto.email },
     });
 
     if (!_.isNil(existUser)) {
@@ -41,17 +44,17 @@ export class UserService {
       );
     }
     const newUser = await this.userRepository.save(createUserDto);
-          
+
     return createUserDto.email;
   }
 
-//POST	로그인	/user/login
+  //POST	로그인	/user/login
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
 
     const user = await this.userRepository.findOne({
       where: { email, deletedAt: null },
-      select: ['id','email', 'password'],
+      select: ['id', 'email', 'password'],
     });
 
     if (_.isNil(user)) {
@@ -70,27 +73,22 @@ export class UserService {
     return accessToken;
   }
 
-
-//POST	로그아웃	/user/logout
-logout() {
-  return { message: '로그아웃이 성공적으로 완료되었습니다.' }
+  //POST	로그아웃	/user/logout
+  logout() {
+    return { message: '로그아웃이 성공적으로 완료되었습니다.' };
   }
 
-
-
-
-// test용 전체조회
+  // test용 전체조회
   async findAll() {
-    const user = await this.userRepository.find({
-    });
+    const user = await this.userRepository.find({});
     if (_.isNil(user)) {
       throw new NotFoundException(`유저를 찾을 수 없습니다.`);
     }
-    return user
+    return user;
   }
 
-//GET	회원 정보 조회	/user/:userId
-async findOne(userId:number, authorization:string) {
+  //GET	회원 정보 조회	/user/:userId
+  async findOne(userId: number, authorization: string) {
     if (!authorization) {
       throw new UnauthorizedException('JWT 토큰이 필요합니다.');
     }
@@ -100,27 +98,28 @@ async findOne(userId:number, authorization:string) {
       throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
     }
     const payload = this.jwtService.verify(token);
+    console.log('----------------', payload);
     const myId = payload.id;
-
+    console.log('----------------', myId);
     if (!myId) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
-      if (!userId) {
-        throw new UnauthorizedException('찾으려는 userId를 입력하세요');
-      }
-  const user = await this.userRepository.findOne({
-    where:{id:userId},
-    select: ['name','email'],
-  });
+    if (!userId) {
+      throw new UnauthorizedException('찾으려는 userId를 입력하세요');
+    }
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['name', 'email'],
+    });
 
-  if (_.isNil(user)) {
-    throw new NotFoundException(`유저를 찾을 수 없습니다.`);
+    if (_.isNil(user)) {
+      throw new NotFoundException(`유저를 찾을 수 없습니다.`);
+    }
+    return user;
   }
-  return user
-}
 
-//GET	내 정보 상세조회	/user/me
-  async findMe(authorization:string) {
+  //GET	내 정보 상세조회	/user/me
+  async findMe(authorization: string) {
     if (!authorization) {
       throw new UnauthorizedException('JWT 토큰이 필요합니다.');
     }
@@ -130,110 +129,104 @@ async findOne(userId:number, authorization:string) {
       throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
     }
 
-      const payload = this.jwtService.verify(token);
-      const userId = payload.id;
+    const payload = this.jwtService.verify(token);
+    const userId = payload.id;
 
-      if (!userId) {
-        throw new UnauthorizedException('유효하지 않은 토큰입니다.');
-      }
-const user = await this.userRepository.findOne({
-      where:{id : userId},
-      select: ['name','email','password'],
+    if (!userId) {
+      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+    }
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['name', 'email', 'password'],
     });
 
     if (_.isNil(user)) {
       throw new NotFoundException(`토큰오류.`);
     }
-    return user
-
-}
-
-    
-  
-
-//PATCH	회원 정보 수정	/user/me
-// 비번수정 안됨
-async update( updateUserDto: UpdateUserDto, authorization:string) {
-  if (!authorization) {
-    throw new UnauthorizedException('JWT 토큰이 필요합니다.');
+    return user;
   }
 
-  const token = authorization.split(' ')[1];
-  if (!token) {
-    throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
-  }
-  const payload = this.jwtService.verify(token);
-  const myId = payload.id;
-
-  if (!myId) {
-    throw new UnauthorizedException('유효하지 않은 토큰입니다.');
-  }
-    if (!updateUserDto) {
-      throw new UnauthorizedException('수정할 정보를 입력하세요');
-    }
-
-    // 조회
-  const myInfo = await this.userRepository.findOne({
-    where:{id : myId},
-  });
-
-  if (_.isNil(myInfo)) {
-    throw new NotFoundException(`토큰오류.`);
-  }
-  // 비번 비교    
-  if (updateUserDto.password !==myInfo.password) {
-    throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-  }
-
-  // 업데이트할 데이터 생성
-  const updatedData: Partial<User> = {
-    name: updateUserDto.name || myInfo.name,
-    email: updateUserDto.email || myInfo.email,
-    password :updateUserDto.newPassword || myInfo.password
-  };
-  // 데이터베이스 업데이트
-  await this.userRepository.update({ id: myId }, updatedData);
-
-  // 업데이트된 사용자 반환
-  return this.userRepository.findOne({ where: { id: myId } });
-}
-
-  
-
-//DELETE	회원 탈퇴	/user/me 
-  async remove(deleteUserDto:DeleteUserDto,authorization:string) {
+  //PATCH	회원 정보 수정	/user/me
+  // 비번수정 안됨
+  async update(updateUserDto: UpdateUserDto, authorization: string) {
     if (!authorization) {
       throw new UnauthorizedException('JWT 토큰이 필요합니다.');
     }
-  
+
     const token = authorization.split(' ')[1];
     if (!token) {
       throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
     }
     const payload = this.jwtService.verify(token);
     const myId = payload.id;
-  
+
     if (!myId) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
-      if (!deleteUserDto) {
-        throw new UnauthorizedException('수정할 정보를 입력하세요');
-      }
-  
-      // 조회
-  const myInfo = await this.userRepository.findOne({
-    where:{id : myId},
-    select: ['password'],
-  });
-  
-  if (_.isNil(myInfo)) {
-    throw new NotFoundException(`토큰오류.`);
+    if (!updateUserDto) {
+      throw new UnauthorizedException('수정할 정보를 입력하세요');
+    }
+
+    // 조회
+    const myInfo = await this.userRepository.findOne({
+      where: { id: myId },
+    });
+
+    if (_.isNil(myInfo)) {
+      throw new NotFoundException(`토큰오류.`);
+    }
+    // 비번 비교
+    if (updateUserDto.password !== myInfo.password) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+
+    // 업데이트할 데이터 생성
+    const updatedData: Partial<User> = {
+      name: updateUserDto.name || myInfo.name,
+      email: updateUserDto.email || myInfo.email,
+      password: updateUserDto.newPassword || myInfo.password,
+    };
+    // 데이터베이스 업데이트
+    await this.userRepository.update({ id: myId }, updatedData);
+
+    // 업데이트된 사용자 반환
+    return this.userRepository.findOne({ where: { id: myId } });
   }
-      // 비번 비교
-      if (deleteUserDto.password !==myInfo.password) {
-        throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
-      }
-  
-  return  this.userRepository.softDelete({ id: myId });
+
+  //DELETE	회원 탈퇴	/user/me
+  async remove(deleteUserDto: DeleteUserDto, authorization: string) {
+    if (!authorization) {
+      throw new UnauthorizedException('JWT 토큰이 필요합니다.');
+    }
+
+    const token = authorization.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
+    }
+    const payload = this.jwtService.verify(token);
+    const myId = payload.id;
+
+    if (!myId) {
+      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+    }
+    if (!deleteUserDto) {
+      throw new UnauthorizedException('수정할 정보를 입력하세요');
+    }
+
+    // 조회
+    const myInfo = await this.userRepository.findOne({
+      where: { id: myId },
+      select: ['password'],
+    });
+
+    if (_.isNil(myInfo)) {
+      throw new NotFoundException(`토큰오류.`);
+    }
+    // 비번 비교
+    if (deleteUserDto.password !== myInfo.password) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+
+    return this.userRepository.softDelete({ id: myId });
   }
 }
