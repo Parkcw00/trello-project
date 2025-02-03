@@ -4,6 +4,8 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { Repository } from 'typeorm'; // TypeORM의 Repository를 가져옵니다.
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
+import { Member } from 'src/member/entities/member.entity';
+import { Board } from 'src/board/entities/board.entity';
 import { LexoRank } from 'lexorank';
 import _ from 'lodash';
 
@@ -12,13 +14,16 @@ import _ from 'lodash';
 export class CardService {
   // 생성자에서 카드 레포지토리를 주입받습니다.
   constructor(
+    @InjectRepository(Member) private memberRepository: Repository<Member>,
+    @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(Card) // Card 엔티티에 대한 레포지토리를 주입합니다.
     private cardRepository: Repository<Card>, // 주입된 레포지토리를 private 변수로 선언합니다.
   ) {}
   async createCard(columnId: number, createCardDto: CreateCardDto) {
     let lexoRank: LexoRank;
     const existingCard = await this.cardRepository.findOne({
-      where: {},
+      where: { id: columnId },
+      relations: ['board'],
       order: { lexo: 'DESC' },
     });
     if (existingCard && existingCard.lexo) {
