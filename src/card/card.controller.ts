@@ -12,9 +12,10 @@ import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { Card } from './entities/card.entity';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('카드CRUD')
+@ApiBearerAuth()
 @Controller('columns/:columnId/cards')
 export class CardController {
   constructor(private readonly cardService: CardService) {}
@@ -46,13 +47,14 @@ export class CardController {
   }
 
   @ApiOperation({ summary: '카드 수정' })
-  @Patch(':cardId')
+  @Patch(':cardId/:targetCardId')
   update(
     @Param('columnId', ParseIntPipe) columnId: number,
     @Param('cardId', ParseIntPipe) cardId: number,
-    @Body() updateCardDto: UpdateCardDto,
+    @Param('targetCardId', ParseIntPipe) targetCardId: number,
+    // @Body() updateCardDto: UpdateCardDto,
   ): Promise<Card> {
-    return this.cardService.updateCard(cardId, columnId, updateCardDto);
+    return this.cardService.updateCardOrder(columnId, cardId, targetCardId);
   }
 
   @ApiOperation({ summary: '카드 삭제' })

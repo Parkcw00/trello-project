@@ -4,9 +4,9 @@ import { IsNumber, IsNotEmpty } from 'class-validator'; // 데코레이터 가�
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateColumnDto extends PartialType(CreateColumnDto) {
-    @IsNotEmpty()
-    id: number;
+    // @IsNotEmpty()
+    // id: number;
 
-    @IsNotEmpty()
-    targetColumnId: number;
+    // @IsNotEmpty()
+    // targetColumnId: number;
 }

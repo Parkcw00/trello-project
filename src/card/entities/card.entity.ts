@@ -36,8 +36,8 @@ export class Card {
   @Column({ type: 'timestamp', nullable: true })
   dueDate: Date;
 
-  @Column({ type: 'bigint', nullable: false })
-  cardPosition: number;
+  @Column({ type: 'varchar', nullable: true })
+  lexo: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
