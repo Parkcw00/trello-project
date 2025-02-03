@@ -14,8 +14,6 @@ import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
-
-
 // 1번
 
 @Module({
@@ -47,7 +45,9 @@ import { UserService } from './user.service';
               req.user = payload; // 요청 user에 할당
               next();
             } catch (err) {
-              throw new UnauthorizedException(`JWT 토큰이 올바르지 않습니다: ${token}`);
+              throw new UnauthorizedException(
+                `JWT 토큰이 올바르지 않습니다: ${token}`,
+              );
             }
           },
         };
@@ -55,6 +55,7 @@ import { UserService } from './user.service';
       inject: [JwtService],
     },
   ],
+  exports: [UserService],
 })
 export class UserModule {}
 

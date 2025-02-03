@@ -26,12 +26,13 @@ export class BoardService {
   }
 
   async getBoard(boardId: number): Promise<Board> {
-    /*const member = await this.memberRepository.findBy({ //보드에 속한 맴버만 볼수 있게 검증
+    const member = await this.memberRepository.findBy({
+      //보드에 속한 맴버만 볼수 있게 검증
       boardId: boardId,
-    }); 
+    });
     if (!member) {
       throw new NotFoundException('해당 보드에 대한 접근 권한이 없습니다.');
-    }*/
+    }
     const board = await this.boardRepository.findOne({
       where: { id: boardId },
     });
@@ -55,15 +56,16 @@ export class BoardService {
           gitLink: uuidv4(), // 초대 코드 생성
         });
 
-        /*const savedBoard =*/ await entityManager.save(newBoard);
+        const savedBoard = await entityManager.save(newBoard);
 
         // 오너를 멤버 테이블에 추가
-        // const member = entityManager.create(Member, { //맴버추가 예시 변경필요
-        //   board: savedBoard, // 생성된 보드와의 관계 설정
-        //   userId: ownerId, // 오너의 ID
-        // });
+        const member = entityManager.create(Member, {
+          //맴버추가 예시 변경필요
+          board: savedBoard, // 생성된 보드와의 관계 설정
+          userId: ownerId, // 오너의 ID
+        });
 
-        // await entityManager.save(member);
+        await entityManager.save(member);
       },
     );
   }

@@ -229,4 +229,8 @@ export class UserService {
 
     return this.userRepository.softDelete({ id: myId });
   }
+
+  async findById(userId: any) {
+    return await this.userRepository.findOneBy({ id: userId });
+  }
 }
