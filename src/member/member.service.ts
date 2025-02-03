@@ -114,7 +114,7 @@ export class MemberService {
   }
 
   /**
-   * 📌 특정 보드에 멤버 추가
+   * 특정 보드에 멤버 추가
    * - 사용자가 보드에 새로운 멤버를 추가할 수 있음
    * - `Authorization` 헤더에서 JWT 토큰을 검증하고 추가 진행
    *

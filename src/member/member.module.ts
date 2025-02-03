@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 /**
- * 📌 멤버 관련 모듈 (MemberModule)
+ * 멤버 관련 모듈 (MemberModule)
  * - 멤버 관련 서비스, 컨트롤러, DB 엔티티를 포함
  * - JwtModule을 직접 등록하여 JwtService 사용 가능
  */
