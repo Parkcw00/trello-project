@@ -14,7 +14,7 @@ import { User } from 'src/user/entities/user.entity';
 @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
 @ApiTags('컬럼CRUD')
-@Controller('column') // 컨트롤러 데코레이터 사용
+@Controller('board/:boardId/column') // 컨트롤러 데코레이터 사용
 export class ColumnController { // 컨트롤러 클래스
   constructor(private readonly columnService: ColumnService) {} // 생성자 메서드
 
@@ -27,7 +27,7 @@ export class ColumnController { // 컨트롤러 클래스
   }
 
   @ApiOperation({ summary: '보드안에 있는 모든 컬럼 조회' })
-  @Get(':boardId') // 모든 컬럼 조회 메서드
+  @Get() // 모든 컬럼 조회 메서드
   findAll(
     @UserInfo() user: User,
     @Param('boardId', ParseIntPipe) boardId: number
@@ -36,12 +36,14 @@ export class ColumnController { // 컨트롤러 클래스
   }
 
   @ApiOperation({ summary: '특정 컬럼 조회' })
-  @Get(':id')
+  @Get(':columnId')
   findOne(
-    @Param('id', ParseIntPipe) id: number,
-    @UserInfo() user: User, @Param('boardId', ParseIntPipe) boardId: number) { // 특정 컬럼 조회 메서드
+    @Param('columnId', ParseIntPipe) columnId: number,
+    @UserInfo() user: User, 
 
-    return this.columnService.findOne(id, user.id, boardId); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 조회
+    @Param('boardId', ParseIntPipe) boardId: number) { // 특정 컬럼 조회 메서드
+
+    return this.columnService.findOne(columnId, user.id, boardId); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 조회
   }
 
 
@@ -58,10 +60,13 @@ export class ColumnController { // 컨트롤러 클래스
   }
 
 
-  // @Roles(Role.Admin) // 권한 데코레이터를 사용해서 컴럼 삭제가 가능한 권한을 가진 사용자만 접근 가능하도록 설정
   @ApiOperation({ summary: '컬럼 삭제' })
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @UserInfo() user: User) { // 컬럼 삭제 메서드
-    return this.columnService.delete(id, user.id); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 삭제
+  @Delete(':columnId')
+  remove(
+    @Param('columnId', ParseIntPipe) columnId: number, 
+    @UserInfo() user: User, 
+    @Param('boardId', ParseIntPipe) boardId: number) { // 컬럼 삭제 메서드
+    return this.columnService.delete(columnId, user.id, boardId); // 컬럼 서비스를 이용해서 특정 컬럼 데이터를 삭제
   }
+
 }

@@ -24,9 +24,9 @@ export class ColumnService { // 서비스 클래스
     const checkMember = await this.memberRepository.findOne({
       where: { userId: userId, boardId: createColumnDto.boardId },
       });
-      console.log(checkMember);
-    if(!checkMember){
-    throw new NotFoundException('컬럼을 만들수 있는 권한이 존재하지 않습니다.');
+      
+      if(!checkMember){
+      throw new NotFoundException('컬럼을 만들수 있는 권한이 존재하지 않습니다.')
       }
 
     let lexoRank: LexoRank;
@@ -43,6 +43,7 @@ export class ColumnService { // 서비스 클래스
       columnType: createColumnDto.columnType,
       boardId: createColumnDto.boardId,
       lexo: lexoRank.toString(),
+      memberId: checkMember.id,
     });
 
     const savedColumn = await this.columnRepository.save(newColumn);
@@ -53,24 +54,40 @@ export class ColumnService { // 서비스 클래스
       boardId: number,
       userId: number
     ): Promise<ColumnEntity[]> { // 모든 컬럼 조회 메서드
+
+      const checkMember = await this.memberRepository.findOne({
+        where: { userId: userId, boardId: boardId },
+        });
+        
+        if(!checkMember){
+        throw new NotFoundException('컬럼을 조회 할 수 있는 권한이 존재하지 않습니다.')
+        }
+
       return await this.columnRepository.find({
         where: {
           boardId: boardId,
-          memberId: userId,
         },
-        relations: ['board', 'board.members'],
       }); // 리포지토리 인스턴스를 사용해서 모든 컬럼 데이터를 조회
+
 
     }
 
   async findOne(
-    id: number,
+    columnId: number,
     userId: number,
     boardId: number
   ): Promise<ColumnEntity> { // 특정한 컬럼 조회 메서드
+
+    const checkMember = await this.memberRepository.findOne({
+      where: { userId: userId, boardId: boardId },
+      });
+      
+      if(!checkMember){
+      throw new NotFoundException('컬럼을 조회 할 수 있는 권한이 존재하지 않습니다.')
+      }
+
     const column = await this.columnRepository.findOne({
-       where: { id },
-       relations: ['board', 'board.members'],
+       where: { id: columnId },
       }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
 
     
@@ -89,6 +106,16 @@ export class ColumnService { // 서비스 클래스
     targetColumnId: number,
     userId: number
   ): Promise<ColumnEntity> {
+
+    const checkMember = await this.memberRepository.findOne({
+      where: { userId: userId, boardId: boardId },
+      });
+      
+      if(!checkMember){
+      throw new NotFoundException('컬럼을 순서를 변경 할 수 있는 권한이 존재하지 않습니다.')
+      }
+      
+
     const columns = await this.columnRepository.find({
       where: { boardId },
       order: { lexo: 'DESC' },
@@ -188,12 +215,22 @@ export class ColumnService { // 서비스 클래스
     // 카드의 순서 업데이트
   }
 
-  async delete(id: number,userId: number): Promise<string> {
-    const column = await this.columnRepository.findOne({ where: { id } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
+  async delete(columnId: number,userId: number,boardId: number): Promise<string> {
+
+    const checkMember = await this.memberRepository.findOne({
+      where: { userId: userId, boardId: boardId },
+      });
+      
+      if(!checkMember){
+      throw new NotFoundException('컬럼을 삭제 할 수 있는 권한이 존재하지 않습니다.')
+      }
+      
+    const column = await this.columnRepository.findOne({ where: { id: columnId } }); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 조회
     if (!column) {
         throw new NotFoundException('컬럼이 존재하지 않습니다.'); // 컬럼이 존재하지 않을 경우 오류 발생
     }
-    await this.columnRepository.delete(id); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 삭제
-    return `선택한 ${id} 컬럼이 삭제 되었습니다.`;
-  }
+    if(checkMember.id === column.memberId){
+    await this.columnRepository.delete(columnId); // 리포지토리 인스턴스를 사용해서 아이디를 조건으로 특정 컬럼 데이터를 삭제
+    return `선택한 ${columnId} 컬럼이 삭제 되었습니다.`;
+    }}
 }
