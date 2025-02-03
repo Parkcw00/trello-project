@@ -15,6 +15,8 @@ import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 
+import { APP_GUARD } from '@nestjs/core'; // 추가
+
 const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
@@ -26,8 +28,15 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록
-    synchronize: true,
+    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록  -  경로 잘못??
+    // entities: [
+    //   process.env.NODE_ENV === 'production'
+    //     ? 'dist/**/*.entity.js' // 배포 환경에서는 dist 폴더 사용
+    //     : 'src/**/*.entity.ts',  // 개발 환경에서는 src 사용
+    // ],
+    /// 개발, dev 인
+    synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
+    migrationsRun: true, // 앱 실행 시 마이그레이션 적용
     logging: true,
   }),
   inject: [ConfigService],

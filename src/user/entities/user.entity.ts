@@ -20,11 +20,12 @@ export class User {
   @Column({ type: 'varchar', unique: true, nullable: false })
   email: string;
 
-  @Column({ type: 'varchar', nullable: false, length: 10 })
+  @Column({ type: 'varchar', nullable: false, length: 15 })
   name: string;
 
-  @Column({ type: 'varchar', nullable: false, length: 18 })
+  @Column({ type: 'varchar', length: 255, nullable: false }) // 해싱하면 길어지니 한계 없애기
   password: string;
+  // 예시 :  '$2b$10$1dcY95A77vNF5RgUl8MwYeee3ED2KnmnIUlCx51eHY7v5kW7n7igi'
 
   @CreateDateColumn()
   createAt: Date;
