@@ -5,7 +5,6 @@ import { ColumnService } from './column.service'; // 서비스 가져오기
 import { ColumnController } from './column.controller'; // 컨트롤러 가져오기
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AuthMiddleware } from '../auth/auth.middleware'; // 인증 미들웨어 임포트
 
 @Module({
   imports: [

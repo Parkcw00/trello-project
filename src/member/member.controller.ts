@@ -25,7 +25,7 @@ import {
  * - 특정 보드(board)에 대한 멤버 관리 기능 제공
  * - 기본 경로: `/board/:boardId/members`
  */
-@ApiTags('멤버') // Swagger에서 '멤버' 그룹으로 표시
+@ApiTags('멤버CRUD') // Swagger에서 '멤버CRUD' 그룹으로 표시
 @Controller('board/:boardId/members')
 export class MemberController {
   /**

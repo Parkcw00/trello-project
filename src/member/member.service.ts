@@ -9,7 +9,8 @@ import { Member } from './entities/member.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Board } from 'src/board/entities/board.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt'; // JwtService는 NestJS에서 JWT(JSON Web Token)를 생성하고 검증하는 기능을 제공하는 서비스
+// 이 모듈을 사용하면 로그인 및 인증 관련 로직에서 JWT 토큰을 발급하고 검증할 수 있음
 import { ConflictException } from '@nestjs/common'; // 중복 예외 처리 추가
 
 /**
@@ -30,7 +31,7 @@ export class MemberService {
     @InjectRepository(Member) private memberRepository: Repository<Member>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Board) private boardRepository: Repository<Board>,
-    private jwtService: JwtService, // JWT 검증을 위한 서비스
+    private jwtService: JwtService, // JWT 검증을 위한 서비스 , JwtService 주입
   ) {}
 
   /**
