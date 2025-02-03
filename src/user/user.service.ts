@@ -98,8 +98,9 @@ export class UserService {
       throw new UnauthorizedException('JWT 토큰이 유효하지 않습니다.');
     }
     const payload = this.jwtService.verify(token);
+    console.log('----------------', payload);
     const myId = payload.id;
-
+    console.log('----------------', myId);
     if (!myId) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
