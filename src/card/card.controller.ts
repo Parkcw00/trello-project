@@ -65,3 +65,5 @@ export class CardController {
     return { message: '카드가 삭제되었습니다' };
   }
 }
+
+// 미들웨어를 거쳐서 req.user로 받아오도록
