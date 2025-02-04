@@ -101,7 +101,7 @@ export class MemberController {
     @Body() createMemberDto: CreateMemberDto,
     @Request() req,
   ) {
-    console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id });
+    // console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id });
 
     // JWT 인증이 제대로 되지 않은 경우 에러 발생
     if (!req.user || !req.user.id) {
