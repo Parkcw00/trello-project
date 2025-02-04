@@ -103,8 +103,8 @@ export class MemberController {
   ) {
     // console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id });
 
-    // JWT 인증이 제대로 되지 않은 경우 에러 발생
-    if (!req.user || !req.user.id) {
+    // JWT 인증이 실패하면 예외를 던진다
+    if (!req?.user?.id) {
       throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
     }
 
@@ -137,8 +137,8 @@ export class MemberController {
   ) {
     console.log('[DELETE] 멤버 삭제 요청:', { userId: req.user?.id });
 
-    // JWT 인증이 제대로 되지 않은 경우 에러 발생
-    if (!req.user || !req.user.id) {
+    // JWT 인증이 실패하면 예외를 던진다
+    if (!req?.user?.id) {
       throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
     }
 
