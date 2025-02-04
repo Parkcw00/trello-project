@@ -47,7 +47,6 @@ export class UserService {
 
     const existUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
-      where: { email: createUserDto.email },
     });
 
     if (existUser) {
@@ -86,7 +85,6 @@ export class UserService {
 
     const user = await this.userRepository.findOne({
       where: { email, deletedAt: null },
-      select: ['id', 'email', 'password'],
       select: ['id', 'email', 'password'],
     });
 
@@ -302,5 +300,9 @@ export class UserService {
     }
 
     return { message: '회원 탈퇴가 완료되었습니다.' };
+  }
+
+  async findById(userId: any) {
+    return await this.userRepository.findOneBy({ id: userId });
   }
 }
