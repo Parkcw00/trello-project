@@ -19,8 +19,9 @@ async function bootstrap() {
     .addServer('http://localhost:3000/', 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://production.yourapi.com/', 'Production')
-    .addTag('Your API Tag')
     .addBearerAuth()
+    .addTag('Your API Tag')
+    .addBearerAuth() // JWT 베어러 인증 추가
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
@@ -31,4 +32,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-
