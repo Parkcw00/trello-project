@@ -20,7 +20,9 @@ export class Board {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.board)
+  @ManyToOne(() => User, (user) => user.board, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'owner_id' })
   user: User[];
 

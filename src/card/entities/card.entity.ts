@@ -4,7 +4,6 @@ import { Member } from 'src/member/entities/member.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { File } from 'src/file/entities/file.entity';
 
-
 import {
   Column,
   Entity,
@@ -48,14 +47,18 @@ export class Card {
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
 
-  @ManyToOne(() => ColumnEntity, (column) => column.card)
+  @ManyToOne(() => ColumnEntity, (column) => column.card, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'column_id' })
   column: ColumnEntity;
 
   @Column({ type: 'bigint' })
   columnId: number;
 
-  @ManyToOne(() => Member, (member) => member.card)
+  @ManyToOne(() => Member, (member) => member.card, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'member_id' })
   member: Member;
 

@@ -1,5 +1,6 @@
 import { Board } from 'src/board/entities/board.entity';
 import { Card } from 'src/card/entities/card.entity';
+import { Member } from 'src/member/entities/member.entity';
 import {
   Column,
   Entity,
@@ -22,7 +23,18 @@ export class ColumnEntity {
   @Column({ type: 'varchar', nullable: true })
   lexo: string;
 
-  @ManyToOne(() => Board, (board) => board.columns) // 보드 엔티티와 n:1 관계 설정
+  @ManyToOne(() => Member, (member) => member.columns, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'member_id' })
+  member: Member;
+
+  @Column({ type: 'bigint', nullable: false })
+  memberId: number;
+
+  @ManyToOne(() => Board, (board) => board.columns, {
+    onDelete: 'CASCADE',
+  }) // 보드 엔티티와 n:1 관계 설정
   @JoinColumn({ name: 'board_id' }) // 보드 아이디를 조건으로 조회
   board: Board; // 보드 엔티티 인스턴스 생성
 

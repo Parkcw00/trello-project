@@ -25,14 +25,14 @@ export class BoardService {
     });
   }
 
-  async getBoard(boardId: number): Promise<Board> {
-    const member = await this.memberRepository.findBy({
-      //보드에 속한 맴버만 볼수 있게 검증
-      boardId: boardId,
+  async getBoard(ownerId: number, boardId: number): Promise<Board> {
+    const member = await this.memberRepository.findOne({
+      where: { userId: ownerId, boardId },
     });
     if (!member) {
       throw new NotFoundException('해당 보드에 대한 접근 권한이 없습니다.');
     }
+
     const board = await this.boardRepository.findOne({
       where: { id: boardId },
     });
@@ -80,7 +80,7 @@ export class BoardService {
     await this.boardRepository.update({ id }, { title, content, expriyDate });
   }
 
-  async deleteBoard(id: number, ownerId: number): Promise<void> {
+  async deleteBoard(ownerId: number, id: number): Promise<void> {
     await this.verifyMessage(id, ownerId);
     await this.boardRepository.delete({ id });
   }
