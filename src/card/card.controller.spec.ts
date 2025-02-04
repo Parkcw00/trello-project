@@ -53,7 +53,7 @@ describe('CardController', () => {
       expect(mockCardService.createCard).toHaveBeenCalledWith(
         1,
         1,
-        createCardDto, // 컨트롤러에 리턴값이 3개였으니까 3개 다줘야함!
+        createCardDto, // 컨트롤러에 리턴값이 3개였으니까 3개 다줘야함! 받는값을 넣어줘야해요!
       );
       expect(response).toEqual(result);
     });
