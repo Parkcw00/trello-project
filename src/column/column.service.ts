@@ -23,14 +23,15 @@ export class ColumnService {
 
   async create(
     userId: number,
+    boardId: number,
     createColumnDto: CreateColumnDto,
   ): Promise<ColumnEntity> {
     // 데이터 생성 메서드
 
-    const checkMember = await this.memberRepository.findOne({
-      where: { userId: userId, boardId: createColumnDto.boardId },
-    });
 
+    const checkMember = await this.memberRepository.findOne({
+      where: { userId: userId, boardId:boardId },
+    });
     if (!checkMember) {
       throw new NotFoundException(
         '컬럼을 만들수 있는 권한이 존재하지 않습니다.',
@@ -49,9 +50,10 @@ export class ColumnService {
     }
     const newColumn: ColumnEntity = this.columnRepository.create({
       columnType: createColumnDto.columnType,
-      boardId: createColumnDto.boardId,
+      boardId: boardId,
       lexo: lexoRank.toString(),
       memberId: checkMember.id,
+
     });
 
     const savedColumn = await this.columnRepository.save(newColumn);
