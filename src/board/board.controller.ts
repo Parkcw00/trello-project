@@ -13,7 +13,7 @@ import { BoardDto } from './dto/board.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './../utils/userInfo.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth()
