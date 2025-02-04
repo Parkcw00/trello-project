@@ -1,72 +1,26 @@
-import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+// user.module.ts
 import {
-  Injectable,
-  NestMiddleware,
-  UnauthorizedException,
+  Module,
+  MiddlewareConsumer,
+  NestModule,
+  RequestMethod,
 } from '@nestjs/common';
 
-import { JwtService } from '@nestjs/jwt';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt'; // WT 관련 기능을 제공하는 모듈. 이를 imports 배열에 추가하여 사용
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
 import { User } from './entities/user.entity';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { AuthMiddleware } from '../auth/auth.middleware'; // 분리된 미들웨어
 
-// 1번
-
+//import { AuthModule } from '../auth/auth.module'; // 추가
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]), // TypeORM을 위한 설정
+    TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET_KEY'),
-      }),
-      inject: [ConfigService],
-    }),
-  ],
-  controllers: [UserController],
-  providers: [
-    UserService,
-    {
-      provide: 'APP_MIDDLEWARE',
-      useFactory: (jwtService: JwtService) => {
-        return {
-          async use(req: any, res: any, next: Function) {
-            const authHeader = req.headers.authorization;
-            if (!authHeader) {
-              throw new UnauthorizedException('JWT 토큰을 찾을 수 없습니다!');
-            }
-            let token: string;
-            try {
-              token = authHeader.split(' ')[1];
-              const payload = await jwtService.verify(token);
-              req.user = payload; // 요청 user에 할당
-              next();
-            } catch (err) {
-              throw new UnauthorizedException(
-                `JWT 토큰이 올바르지 않습니다: ${token}`,
-              );
-            }
-          },
-        };
-      },
-      inject: [JwtService],
-    },
-  ],
-  exports: [UserService],
-})
-export class UserModule {}
-
-//2번
-/*
-@Module({
-  imports: [
-    TypeOrmModule.forFeature([User]), // TypeORM 강의 참고
-    JwtModule.registerAsync({
-      useFactory: (config: ConfigService) => ({
-        // .env 파일에 'JWT_SECRET_KEY' 키로 비밀키를 저장해두고 사용.
         secret: config.get<string>('JWT_SECRET_KEY'),
       }),
       inject: [ConfigService],
@@ -74,6 +28,19 @@ export class UserModule {}
   ],
   controllers: [UserController],
   providers: [UserService],
+  exports: [UserService, JwtModule],
 })
-export class UserModule {}
-*/
+// export class UserModule {}
+export class UserModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        { path: 'user/login', method: RequestMethod.POST },
+        { path: 'user/signup', method: RequestMethod.POST },
+        { path: 'user/refresh', method: RequestMethod.GET },
+        { path: 'user/users', method: RequestMethod.GET },
+      )
+      .forRoutes(UserController);
+  }
+}
