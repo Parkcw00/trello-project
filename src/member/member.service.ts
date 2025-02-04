@@ -22,8 +22,8 @@ export class MemberService {
 
   /**
    * 특정 보드의 모든 멤버 목록 조회
-   * @param boardId 조회할 보드의 ID
-   * @returns 멤버 목록과 성공 메시지
+   * param boardId 조회할 보드의 ID
+   * returns 멤버 목록과 성공 메시지
    */
   async findAll(boardId: number) {
     // 보드가 존재하는지 확인
