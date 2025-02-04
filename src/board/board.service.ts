@@ -5,7 +5,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Board } from './entities/board.entity';
-import { Member } from './../member/entities/member.entity';
+import { Member } from '../member/entities/member.entity';
 import { v4 as uuidv4 } from 'uuid'; // UUID 생성
 import { BoardDto } from './dto/board.dto';
 

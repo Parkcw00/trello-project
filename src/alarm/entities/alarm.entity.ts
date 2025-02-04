@@ -1,7 +1,7 @@
-import { User } from 'src/user/entities/user.entity';
-import { Board } from 'src/board/entities/board.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { Card } from 'src/card/entities/card.entity';
+import { User } from '../../user/entities/user.entity';
+import { Board } from '../../board/entities/board.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Card } from '../../card/entities/card.entity';
 import {
   Column,
   CreateDateColumn,
@@ -13,7 +13,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Member } from 'src/member/entities/member.entity';
+import { Member } from '../../member/entities/member.entity';
 
 @Entity({
   name: 'alarms',
