@@ -1,34 +1,88 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/user/entities/user.entity';
+import { UserInfo } from 'src/utils/userInfo.decorator';
 import { ChecklistService } from './checklist.service';
-import { CreateChecklistDto } from './dto/create-checklist.dto';
-import { UpdateChecklistDto } from './dto/update-checklist.dto';
+import { ChecklistDto } from './dto/checklist.dto';
 
-@Controller('checklist')
+@UseGuards(AuthGuard('jwt'))
+@Controller('cards/:id/checklist')
 export class ChecklistController {
   constructor(private readonly checklistService: ChecklistService) {}
 
-  @Post()
-  create(@Body() createChecklistDto: CreateChecklistDto) {
-    return this.checklistService.create(createChecklistDto);
+  // 카드 체크리스트 추가
+  @Post('')
+  async createChecklist(
+    @UserInfo() user: User,
+    @Param('id') cardId: number,
+    @Body() checklistDto: ChecklistDto,
+  ) {
+    return await this.checklistService.createChecklist(
+      user.id,
+      cardId,
+      checklistDto,
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.checklistService.findAll();
+  // 카드 체크리스트 조회
+  @Get('')
+  async findChecklist(@UserInfo() user: User, @Param('id') cardId: number) {
+    return await this.checklistService.findChecklist(
+      user.id,
+      cardId,
+    );
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.checklistService.findOne(+id);
+  // 카드 체크리스트 내용 수정
+  @Patch(':checklistId')
+  async updateContent(
+    @UserInfo() user: User,
+    @Param('id') cardId: number,
+    @Param('checklistId') checklistId: number,
+    @Body() checklistDto: ChecklistDto,
+  ) {
+    return await this.checklistService.updateContent(
+      user.id,
+      cardId,
+      checklistId,
+      checklistDto,
+    );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChecklistDto: UpdateChecklistDto) {
-    return this.checklistService.update(+id, updateChecklistDto);
+  // 카드 체크리스트 목표 달성 여부 수정
+  @Patch(':checklistId/achieve')
+  async updateAchievement(
+    @UserInfo() user: User,
+    @Param('id') cardId: number,
+    @Param('checklistId') checklistId: number,
+  ) {
+    return await this.checklistService.updateAchievement(
+      user.id,
+      cardId,
+      checklistId,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.checklistService.remove(+id);
+  // 카드 체크리스트 삭제
+  @Delete(':checklistId')
+  async deleteChecklist(
+    @UserInfo() user: User,
+    @Param('id') cardId: number,
+    @Param('checklistId') checklistId: number,
+  ) {
+    return await this.checklistService.deleteChecklist(
+      user.id,
+      cardId,
+      checklistId,
+    );
   }
 }
