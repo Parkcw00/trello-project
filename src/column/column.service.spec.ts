@@ -318,14 +318,6 @@ describe('ColumnService', () => {
     });
   });
 
-  describe('updateColumn', () => {
-    it('권한이 있는 사용자가 컬럼의 위치를 변경할 수 있다.', async () => {
-      // 테스트를 위한 기본 데이터만 설정된 상태
-      const userId = 1;
-      // 추가 구현 필요
-    })
-  })
-
   describe('deleteColumn', () => {
     it('권한이 있는 사용자가 컬럼을 삭제할 수 있다', async () => {
       // 테스트에 사용할 기본 데이터 설정
@@ -384,20 +376,24 @@ describe('ColumnService', () => {
       
       // 개별 컬럼 조회를 위한 mock 설정 (순차적으로 다른 값 반환)
       mockColumnRepository.findOne
-        .mockResolvedValueOnce(mockColumn) // 첫 번째 호출: 이동할 컬럼 반환
-        .mockResolvedValueOnce(mockTargetColumn) // 두 번째 호출: 타겟 컬럼 반환
-        .mockResolvedValueOnce({ ...mockColumn, lexo: expect.any(String) });  // 세 번째 호출: 업데이트된 컬럼 반환
+      // 1. 첫 번째 호출 시
+        .mockResolvedValueOnce(mockColumn) // 반환값: { id: columnId, lexo: '초기 lexo 값' }
+        // 2. 두 번째 호출 시
+        .mockResolvedValueOnce(mockTargetColumn) // 반환값: { id: targetColumnId, lexo: '타겟 lexo 값' }
+        // 3. 세 번째 호출 시
+        .mockResolvedValueOnce({ ...mockColumn, lexo: expect.any(String) });  // 세 번째 호출: 업데이트된 컬럼 반환(lexo 값이 문자열이기만 하면 됨)
 
-      // 컬럼 업데이트를 위한 mock 설정
+      // update 메서드가 성공적으로 실행됐을 때의 결과값 설정
       mockColumnRepository.update.mockResolvedValue({ affected: 1 });
+      // affected: 1 은 1개의 행이 업데이트되었다는 의미입니다.
 
-      // 테스트할 메서드 실행
+      // 실제 서비스의 updateColumnOrder 메서드 실행
       const result = await service.updateColumnOrder(boardId, columnId, targetColumnId, userId);
 
       // 결과 검증
-      expect(result).toBeDefined(); // 결과값이 존재하는지 확인
-      expect(result.id).toBe(columnId); // 올바른 컬럼이 반환되었는지 확인
-      expect(result.lexo).toBeDefined(); // lexoRank가 정상적으로 설정되었는지 확인
+      expect(result).toBeDefined(); // 결과가 null이나 undefined가 아닌지
+      expect(result.id).toBe(columnId); // 반환된 컬럼의 ID가 올바른지
+      expect(result.lexo).toBeDefined(); // lexoRank 값이 설정되었는지
     });
 
     it('권한이 없는 사용자는 컬럼의 위치를 변경할 수 없다', async () => {
