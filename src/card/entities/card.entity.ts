@@ -3,6 +3,7 @@ import { ColumnEntity } from 'src/column/entities/column.entity';
 import { Member } from 'src/member/entities/member.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { File } from 'src/file/entities/file.entity';
+import { Checklist } from 'src/checklist/entities/checklist.entity';
 
 import {
   Column,
@@ -73,4 +74,7 @@ export class Card {
 
   @OneToMany(() => File, (file) => file.card)
   file: File[];
+
+  @OneToMany(() => Checklist, (checklist) => checklist.card)
+  checklist: Checklist[];
 }
