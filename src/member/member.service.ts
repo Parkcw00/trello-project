@@ -7,8 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Member } from './entities/member.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Board } from 'src/board/entities/board.entity';
+import { User } from '../user/entities/user.entity';
+import { Board } from '../board/entities/board.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
 
 @Injectable()

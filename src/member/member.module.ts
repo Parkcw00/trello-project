@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MemberService } from './member.service';
 import { MemberController } from './member.controller';
 import { Member } from './entities/member.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Board } from 'src/board/entities/board.entity';
+import { User } from '../user/entities/user.entity';
+import { Board } from '../board/entities/board.entity';
 import { AuthModule } from 'src/auth/auth.module'; // AuthModule 추가 (JWT 인증 관련 모듈)
 
 // `MemberModule`은 `MemberService`와 `MemberController`를 관리하는 모듈입니다.
