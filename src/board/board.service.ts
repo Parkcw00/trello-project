@@ -80,7 +80,7 @@ export class BoardService {
     await this.boardRepository.update({ id }, { title, content, expriyDate });
   }
 
-  async deleteBoard(id: number, ownerId: number): Promise<void> {
+  async deleteBoard(ownerId: number, id: number): Promise<void> {
     await this.verifyMessage(id, ownerId);
     await this.boardRepository.delete({ id });
   }

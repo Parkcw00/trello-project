@@ -48,7 +48,7 @@ export class BoardController {
   @ApiOperation({ summary: '보드 삭제' })
   @Delete(':boardId') //보드 삭제
   async deleteBoard(@UserInfo() user: User, @Param('boardId') boardId: number) {
-    return await this.boardService.deleteBoard(boardId, user.id);
+    return await this.boardService.deleteBoard(user.id, boardId);
   }
   @ApiOperation({ summary: '보드 링크' })
   @Get(':boardId/link') //보드 링크
