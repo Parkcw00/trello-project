@@ -9,11 +9,11 @@ import { Member } from 'src/member/entities/member.entity';
 import { MemberModule } from 'src/member/member.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ColumnEntity, Board, Member]),
-  BoardModule,
-  MemberModule
-
-],
+  imports: [
+    TypeOrmModule.forFeature([ColumnEntity, Board, Member]),
+    BoardModule,
+    MemberModule,
+  ],
   controllers: [ColumnController], // 컨트롤러 등록
   providers: [ColumnService], // 서비스 등록
 })
