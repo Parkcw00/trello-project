@@ -83,7 +83,6 @@ describe('CommentService', () => {
       });
 
       // Mock Comment create and save
-      // Mock Comment create and save
       const createdComment = {
         content: '테스트 댓글',
         cardId: 1,
