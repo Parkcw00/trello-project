@@ -14,6 +14,7 @@ import { AlarmModule } from './alarm/alarm.module';
 import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
+import { AuthModule } from './auth/auth.module';
 
 import { APP_GUARD } from '@nestjs/core'; // 추가
 
@@ -65,6 +66,7 @@ const typeOrmModuleOptions = {
     AlarmModule,
     CardModule,
     FileModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

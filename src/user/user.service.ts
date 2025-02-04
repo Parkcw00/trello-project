@@ -47,6 +47,7 @@ export class UserService {
 
     const existUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
+      where: { email: createUserDto.email },
     });
 
     if (existUser) {
@@ -79,11 +80,13 @@ export class UserService {
   }
 
   //POST	로그인	/user/login
+  //POST	로그인	/user/login
   async login(loginUserDto: LoginUserDto) {
     const { email, password } = loginUserDto;
 
     const user = await this.userRepository.findOne({
       where: { email, deletedAt: null },
+      select: ['id', 'email', 'password'],
       select: ['id', 'email', 'password'],
     });
 
@@ -168,6 +171,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`유저를 찾을 수 없습니다.`);
     }
+    return user;
     return user;
   }
 
