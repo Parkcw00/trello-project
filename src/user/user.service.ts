@@ -170,7 +170,6 @@ export class UserService {
       throw new NotFoundException(`유저를 찾을 수 없습니다.`);
     }
     return user;
-    return user;
   }
 
   //GET	회원 정보 조회	/user/:userId
