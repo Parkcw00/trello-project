@@ -19,6 +19,9 @@ export class Checklist {
   @Column({ type: 'varchar', nullable: false })
   content: string;
 
+  @Column({ type: 'boolean', default: false }) // done 속성 추가
+  done: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
