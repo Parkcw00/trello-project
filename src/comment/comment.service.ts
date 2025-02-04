@@ -18,7 +18,6 @@ export class CommentService {
   constructor(
     @InjectRepository(Comment) private commentRepository: Repository<Comment>,
     @InjectRepository(Member) private memberRepository: Repository<Member>,
-    @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(Card) private cardRepository: Repository<Card>, // Board 리포지토리 추가
   ) {}
 
@@ -29,7 +28,7 @@ export class CommentService {
     cardId: number,
   ): Promise<Comment> {
     try {
-      // 카드의 컬럼에서 보드 조회
+      // 카드 조회 (컬럼 및 보드 정보 포함)
       const card = await this.cardRepository.findOne({
         where: { id: cardId },
         relations: ['column', 'column.board'],
@@ -41,16 +40,21 @@ export class CommentService {
 
       const boardId = card.column.board.id;
 
-      // 사용자가 해당 보드에 속한 경우에만 댓글 생성 허용
-      const checkMember = await this.memberRepository.findOne({
+      // 사용자가 해당 보드의 멤버인지 확인
+      const member = await this.memberRepository.findOne({
         where: { userId, boardId },
       });
 
-      if (!checkMember) {
+      if (!member) {
         throw new ForbiddenException('댓글 작성 권한이 없습니다.');
       }
 
-      return await this.commentRepository.save({ ...createCommentDto, cardId });
+      // 멤버 ID를 기반으로 댓글 생성
+      return await this.commentRepository.save({
+        ...createCommentDto,
+        cardId,
+        memberId: member.id, // 보드 멤버 ID 할당
+      });
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -173,6 +177,7 @@ export class CommentService {
       }
 
       // 작성자가 아닌 경우 수정 불가
+      console.log('--------------', comment.memberId, boardMember.id);
       if (comment.memberId !== boardMember.id) {
         throw new ForbiddenException(
           '본인이 작성한 댓글만 수정할 수 있습니다.',

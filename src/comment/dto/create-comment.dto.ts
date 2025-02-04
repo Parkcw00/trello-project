@@ -12,8 +12,4 @@ export class CreateCommentDto extends PickType(Comment, [
   @ApiProperty({ example: '오혜성 바보' })
   @IsString() // 데코레이터 사용 ( 문자열 타입 )
   content: string;
-
-  @ApiProperty({ example: 1 })
-  @IsNumber() // 데코레이터 사용 ( 숫자 타입 )
-  memberId: number;
 }
