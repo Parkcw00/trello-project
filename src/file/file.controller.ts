@@ -1,35 +1,60 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileUploadInterceptor } from './interceptors/file-upload.interceptor';
 import { DeleteFileDto } from './dto/delete-file.dto';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { UserInfo } from 'src/utils/userInfo.decorator';
+import { User } from 'src/user/entities/user.entity';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('cards/:id/file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @Post('upload')
   @UseInterceptors(FileUploadInterceptor)
-  async uploadFile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
-    return this.fileService.uploadFile(id, file);
+  async uploadFile(
+    @UserInfo() user: User,
+    @Param('id') cardId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.fileService.uploadFile(user.id, cardId, file);
   }
 
   @Get('')
-  async findFiles(@Param('id') id: string) {
-    return this.fileService.findFiles(id);
+  async findFiles(@UserInfo() user: User, @Param('id') cardId: string) {
+    return this.fileService.findFiles(user.id, cardId);
   }
 
   @Delete('')
-  async deleteFile(@Param('id') id: string, @Body() deleteFileDto: DeleteFileDto) {
-    return this.fileService.deleteFile(id, deleteFileDto)
+  async deleteFile(
+    @UserInfo() user: User,
+    @Param('id') cardId: string,
+    @Body() deleteFileDto: DeleteFileDto,
+  ) {
+    return this.fileService.deleteFile(user.id, cardId, deleteFileDto);
   }
 
   @Get('download/:fileName')
   async downloadFile(
-    @Param('id') id: string,
+    @UserInfo() user: User,
+    @Param('id') cardId: string,
     @Param('fileName') fileName: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.fileService.downloadFile(id, fileName, res);
+    return this.fileService.downloadFile(user.id, cardId, fileName, res);
   }
 }
