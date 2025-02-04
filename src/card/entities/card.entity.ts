@@ -1,8 +1,8 @@
-import { Alarm } from 'src/alarm/entities/alarm.entity';
-import { ColumnEntity } from 'src/column/entities/column.entity';
-import { Member } from 'src/member/entities/member.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { File } from 'src/file/entities/file.entity';
+import { Alarm } from '../../alarm/entities/alarm.entity';
+import { ColumnEntity } from '../../column/entities/column.entity';
+import { Member } from '../../member/entities/member.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { File } from '../../file/entities/file.entity';
 
 import {
   Column,

@@ -1,6 +1,6 @@
-import { Member } from 'src/member/entities/member.entity';
+import { Member } from '../../member/entities/member.entity';
 import { User } from '../../user/entities/user.entity';
-import { ColumnEntity } from 'src/column/entities/column.entity';
+import { ColumnEntity } from '../../column/entities/column.entity';
 import {
   Column,
   CreateDateColumn,
