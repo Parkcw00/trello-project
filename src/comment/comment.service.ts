@@ -9,9 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Member } from 'src/member/entities/member.entity';
-import { Board } from 'src/board/entities/board.entity'; // 추가된 Board 엔티티
 import { Card } from 'src/card/entities/card.entity';
+import { Member } from 'src/member/entities/member.entity';
 
 @Injectable()
 export class CommentService {
@@ -34,6 +33,9 @@ export class CommentService {
         relations: ['column', 'column.board'],
       });
 
+      console.log();
+      console.log('Card:', card);
+
       if (!card) {
         throw new BadRequestException('카드를 찾을 수 없습니다.');
       }
@@ -45,17 +47,21 @@ export class CommentService {
         where: { userId, boardId },
       });
 
+      console.log({ member });
       if (!member) {
         throw new ForbiddenException('댓글 작성 권한이 없습니다.');
       }
 
       // 멤버 ID를 기반으로 댓글 생성
-      return await this.commentRepository.save({
+      const result = await this.commentRepository.save({
         ...createCommentDto,
         cardId,
         memberId: member.id, // 보드 멤버 ID 할당
       });
+      console.log(result);
+      return result;
     } catch (error) {
+      console.log(error);
       if (
         error instanceof BadRequestException ||
         error instanceof ForbiddenException

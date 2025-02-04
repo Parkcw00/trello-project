@@ -79,22 +79,11 @@ export class MemberController {
    * param req JWT 인증된 사용자 정보
    * returns 성공 메시지
    */
-  @Post()
   @UseGuards(AuthGuard('jwt')) // JWT 인증 적용
+  @Post()
   @ApiOperation({
     summary: '멤버 추가',
     description: '특정 보드에 멤버를 추가합니다.',
-  })
-  @ApiParam({
-    name: 'boardId',
-    example: 1,
-    description: '멤버를 추가할 보드 ID',
-  })
-  @ApiBody({ type: CreateMemberDto })
-  @ApiResponse({ status: 201, description: '멤버가 추가되었습니다!' })
-  @ApiResponse({
-    status: 409,
-    description: '이미 이 보드에 추가된 멤버입니다.',
   })
   create(
     @Param('boardId') boardId: number,
