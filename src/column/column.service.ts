@@ -13,6 +13,9 @@ import { Member } from 'src/member/entities/member.entity';
 
 @Injectable() // 서비스에 리포지토리를 의존성 주입
 export class ColumnService {
+  createColumn(userId: number, boardId: number, createColumnDto: CreateColumnDto) {
+    throw new Error('Method not implemented.');
+  }
   // 서비스 클래스
   constructor(
     // 인스턴스를 생성할때 쓰이는 메서드
