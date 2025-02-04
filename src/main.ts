@@ -21,6 +21,7 @@ async function bootstrap() {
     .addServer('https://production.yourapi.com/', 'Production')
     .addBearerAuth()
     .addTag('Your API Tag')
+    .addBearerAuth() // JWT 베어러 인증 추가
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
