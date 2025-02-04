@@ -20,7 +20,7 @@ export class Checklist {
   content: string;
 
   @Column({ type: 'boolean', default: false }) // done 속성 추가
-  done: boolean;
+  achievement: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
