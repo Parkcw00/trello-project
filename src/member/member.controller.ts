@@ -101,12 +101,12 @@ export class MemberController {
     @Body() createMemberDto: CreateMemberDto,
     @Request() req,
   ) {
-    // console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id });
+  //   // console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id });
 
-    // JWT 인증이 실패하면 예외를 던진다
-    if (!req?.user?.id) {
-      throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
-    }
+  //   // JWT 인증이 실패하면 예외를 던진다
+  //   // if (!req?.user?.id) {
+  //   //   throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
+  //   }
 
     return this.memberService.create(boardId, createMemberDto, req.user.id);
   }
@@ -138,9 +138,9 @@ export class MemberController {
     console.log('[DELETE] 멤버 삭제 요청:', { userId: req.user?.id });
 
     // JWT 인증이 실패하면 예외를 던진다
-    if (!req?.user?.id) {
-      throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
-    }
+    // if (!req?.user?.id) {
+    //   throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
+    // }
 
     return this.memberService.delete(boardId, memberId, req.user.id);
   }
