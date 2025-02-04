@@ -1,8 +1,8 @@
-import { User } from 'src/user/entities/user.entity';
-import { Board } from 'src/board/entities/board.entity';
-import { Alarm } from 'src/alarm/entities/alarm.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { Card } from 'src/card/entities/card.entity';
+import { User } from '../../user/entities/user.entity';
+import { Board } from '../../board/entities/board.entity';
+import { Alarm } from '../../alarm/entities/alarm.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Card } from '../../card/entities/card.entity';
 import {
   Column,
   CreateDateColumn,
@@ -14,7 +14,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ColumnEntity } from 'src/column/entities/column.entity';
+import { ColumnEntity } from '../../column/entities/column.entity';
 
 // Member 엔티티: members 테이블에 해당
 @Entity({
