@@ -6,6 +6,7 @@ import {
   Param,
   Body,
   Request,
+  UseGuards, // ✅ 추가
 } from '@nestjs/common';
 import { MemberService } from './member.service';
 import { CreateMemberDto } from './dto/create-member.dto';
@@ -17,6 +18,7 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport'; // ✅ 추가
 
 @ApiTags('멤버CRUD')
 @ApiBearerAuth()
@@ -52,6 +54,7 @@ export class MemberController {
   }
 
   @Post()
+  @UseGuards(AuthGuard('jwt')) // ✅ JWT 인증 적용
   @ApiOperation({
     summary: '멤버 추가',
     description: '특정 보드에 멤버를 추가합니다.',
@@ -72,10 +75,15 @@ export class MemberController {
     @Body() createMemberDto: CreateMemberDto,
     @Request() req,
   ) {
+    console.log('[POST] 멤버 추가 요청:', { userId: req.user?.id }); // ✅ 로그 추가
+    if (!req.user || !req.user.id) {
+      throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
+    }
     return this.memberService.create(boardId, createMemberDto, req.user.id);
   }
 
   @Delete(':memberId')
+  @UseGuards(AuthGuard('jwt')) // ✅ JWT 인증 적용
   @ApiOperation({
     summary: '멤버 삭제',
     description: '특정 보드에서 멤버를 삭제합니다.',
@@ -89,6 +97,10 @@ export class MemberController {
     @Param('memberId') memberId: number,
     @Request() req,
   ) {
+    console.log('[DELETE] 멤버 삭제 요청:', { userId: req.user?.id }); // ✅ 로그 추가
+    if (!req.user || !req.user.id) {
+      throw new Error('JWT 인증 실패: 사용자 정보를 가져올 수 없습니다.');
+    }
     return this.memberService.delete(boardId, memberId, req.user.id);
   }
 }
