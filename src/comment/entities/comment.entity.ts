@@ -28,14 +28,18 @@ export class Comment {
   deletedAt: Date;
 
   // 멤버아이디랑 카드아이디 받기
-  @ManyToOne(() => Member, (member) => member.comment)
+  @ManyToOne(() => Member, (member) => member.comment, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'member_id' })
   member: Member;
 
   @Column({ type: 'bigint', nullable: false })
   memberId: number;
 
-  @ManyToOne(() => Card, (card) => card.comment)
+  @ManyToOne(() => Card, (card) => card.comment, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'card_id' })
   card: Card;
 

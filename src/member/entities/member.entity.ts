@@ -14,6 +14,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ColumnEntity } from 'src/column/entities/column.entity';
 
 // Member 엔티티: members 테이블에 해당
 @Entity({
@@ -36,7 +37,6 @@ export class Member {
   @DeleteDateColumn()
   deletedAt: Date;
 
-
   // 사용자 ID와 연결 (ManyToOne 관계)
   @ManyToOne(() => User, (user) => user.member, {
     onDelete: 'CASCADE',
@@ -49,7 +49,9 @@ export class Member {
   userId: number;
 
   // 게시판 ID와 연결 (ManyToOne 관계)
-  @ManyToOne(() => Board, (board) => board.member)
+  @ManyToOne(() => Board, (board) => board.member, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'board_id' })
   board: Board;
 
@@ -68,4 +70,8 @@ export class Member {
   // 카드와의 관계 설정 (OneToMany 관계)
   @OneToMany(() => Card, (card) => card.member)
   card: Card[];
+
+  // 컬럼과의 관계 설정 (OneToMany 관계)
+  @OneToMany(() => ColumnEntity, (column) => column.member)
+  columns: ColumnEntity[];
 }

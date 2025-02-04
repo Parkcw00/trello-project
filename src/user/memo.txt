@@ -1,0 +1,34 @@
+스웨거 실행
+http://localhost:3000/api-docs
+
+구현 - 테스트 이전
+비밀번호 암호화 추가 (bcrypt 활용)
+JWT 토큰 발급 시 Access Token과 Refresh Token 추가
+.env에서 토큰 수명과 bcrypt salt 값을 관리
+미들웨어에서 토큰 인증 처리
+refreshToken시간이 남아있다면 accessToken 재발행
+로그아웃 - accessToken, refreshToken 남은 시간을 0으로 만들기
+
+도전
+test(jest) - 모두
+인사이트
+대용량 트래픽 처리 → 로드 밸런싱
+
+CI/CD 파이프라인 구축
+알람 - 웹소켓 - 혜성님
+
+인사이트
+레디스 - 이경민
+스크래핑 - 유재은
+모니터링 & 로깅 → EFK 스택 - 박찬우
+
+
+
+
+동시성 처리 → Bull Queue
+
+배포 및 운영 → Docker, Docker Compose, …
+
+대용량 트래픽 처리 → 스트레스 테스트
+
+정적 콘텐츠 서빙 → CDN
