@@ -19,6 +19,7 @@ async function bootstrap() {
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://production.yourapi.com/', 'Production')
     .addTag('Your API Tag')
+    .addBearerAuth() // ✅ JWT Bearer 토큰 입력 필드 추가
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
