@@ -21,9 +21,11 @@ export class ColumnController { // 컨트롤러 클래스
   @ApiOperation({ summary: '컬럼 생성' })
   @Post()
   create(
-    @Body() createColumnDto: CreateColumnDto,
-    @UserInfo() user: User, ){ // 컬럼 생성 메서드 (바디에서 받은 데이터를 이용해서 생성 메서드를 만듬)
-    return this.columnService.create(user.id, createColumnDto); // 컬럼 생성 메서드를 이용해서 컬럼 데이터를 생성
+    @UserInfo() user: User, 
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Body() createColumnDto: CreateColumnDto
+  ){ // 컬럼 생성 메서드 (바디에서 받은 데이터를 이용해서 생성 메서드를 만듬)
+    return this.columnService.create(user.id, boardId, createColumnDto ); // 컬럼 생성 메서드를 이용해서 컬럼 데이터를 생성
   }
 
   @ApiOperation({ summary: '보드안에 있는 모든 컬럼 조회' })
