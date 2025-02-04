@@ -10,20 +10,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Member, User, Board]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET_KEY'),
-        // signOptions: { expiresIn: '1h' },
-      }),
-    }),
+  imports: [TypeOrmModule.forFeature([Member, User, Board])], // ✅ TypeORM 모듈 추가
+  providers: [MemberService], // ✅ MemberService 주입
+  controllers: [MemberController], // ✅ MemberController 등록
+  exports: [
+    MemberService,
+    TypeOrmModule.forFeature([Member]), // ✅ Repository<Member>를 exports
   ],
-  controllers: [MemberController],
-  providers: [MemberService],
-  exports: [MemberService],
 })
 export class MemberModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

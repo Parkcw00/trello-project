@@ -13,12 +13,13 @@ async function bootstrap() {
   );
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
+    .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
     .addServer('http://localhost:3000/', 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://production.yourapi.com/', 'Production')
-    .addBearerAuth() // ✅ JWT Bearer 토큰 입력 필드 추가
+    .addBearerAuth()
     .addTag('Your API Tag')
     .build();
 
