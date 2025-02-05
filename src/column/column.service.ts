@@ -150,8 +150,6 @@ export class ColumnService {
       (column) => column.id === targetColumnId,
     );
 
-    //-------------------------------------------------------------
-
     if (targetColumnIndex < columnIndex) {
       const targetNextColumnIndex = targetColumnIndex - 1;
 
@@ -160,80 +158,83 @@ export class ColumnService {
       }
 
       const currentRank = LexoRank.parse(column.lexo);
-      console.log(`--------------------> 현재 컬럼 랭크`, currentRank);
       const targetRank = LexoRank.parse(targetColumn.lexo);
       const targetNextColumn = columns[targetNextColumnIndex];
 
       if (targetNextColumnIndex < 0) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genNext(); // 현재 컬럼 다음 랭크
+        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genNext();
 
         await this.columnRepository.update(
           { id: columnId, boardId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.columnRepository.findOne({ where: { id: columnId } });
+        const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
+        this.eventEmitter2.emit('column.updated', { boardId: boardId, columnData: updatedColumn });
+        return updatedColumn;
       }
-      const newRank = LexoRank.parse(targetNextColumn.lexo).between(targetRank); // 현재 컬럼와 타켓 컬럼 사이의 랭크
+      const newRank = LexoRank.parse(targetNextColumn.lexo).between(targetRank);
 
       await this.columnRepository.update(
         { id: columnId, boardId },
         { lexo: newRank.toString() },
       );
 
-      return await this.columnRepository.findOne({ where: { id: columnId } });
+      const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
+      this.eventEmitter2.emit('column.updated', { boardId: boardId, columnData: updatedColumn });
+      return updatedColumn;
     } else {
       const maxIndex: number = columns.length - 1;
 
       if (targetColumnIndex === maxIndex) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genPrev(); // 현재 컬럼 다음 랭크
+        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genPrev();
 
         await this.columnRepository.update(
           { id: columnId, boardId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.columnRepository.findOne({ where: { id: columnId } });
+        const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
+        this.eventEmitter2.emit('column.updated', { boardId: boardId, columnData: updatedColumn });
+        return updatedColumn;
       }
 
       const targetNextColumnIndex = targetColumnIndex + 1;
-
-      // const existingCard = await this.cardRepository.findOne({ where: { id: targetCardId }, order: { lexo: "DESC" } })
 
       if (!column || !targetColumn) {
         throw new BadRequestException('컬럼이 존재하지 않습니다.');
       }
 
       const currentRank = LexoRank.parse(column.lexo);
-      console.log(`--------------------> 현재 컬럼 랭크`, currentRank);
       const targetRank = LexoRank.parse(targetColumn.lexo);
       const targetNextColumn = columns[targetNextColumnIndex];
 
       if (targetNextColumnIndex === maxIndex) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genPrev(); // 현재 컬럼 다음 랭크
+        lexoRank = LexoRank.parse(targetColumn.lexo.toString()).genPrev();
 
         await this.columnRepository.update(
           { id: columnId, boardId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.columnRepository.findOne({ where: { id: columnId } });
+        const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
+        this.eventEmitter2.emit('column.updated', { boardId: boardId, columnData: updatedColumn });
+        return updatedColumn;
       }
-      console.log('----------------------------');
-      const newRank = LexoRank.parse(targetNextColumn.lexo).between(targetRank); // 현재 컬럼와 타켓 컬럼 사이의 랭크
+      const newRank = LexoRank.parse(targetNextColumn.lexo).between(targetRank);
 
       await this.columnRepository.update(
         { id: columnId, boardId },
         { lexo: newRank.toString() },
       );
+
       const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
-      this.eventEmitter2.emit('column.created', { boardId: boardId, columnData: updatedColumn });
+      this.eventEmitter2.emit('column.updated', { boardId: boardId, columnData: updatedColumn });
       return updatedColumn;
     }
-    // 카드의 순서 업데이트
   }
 
   async delete(
