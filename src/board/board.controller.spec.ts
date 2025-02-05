@@ -46,7 +46,7 @@ describe('BoardController', () => {
     it('should return a board', async () => {
       const result = await boardController.getBoard(mockUser, 1);
       expect(result).toEqual(mockBoardDto);
-      expect(boardService.getBoard).toHaveBeenCalledWith(mockUser.id, 1);
+      expect(mockBoardService.getBoard).toHaveBeenCalledWith(mockUser.id, 1);
     });
   });
 
@@ -54,14 +54,14 @@ describe('BoardController', () => {
     it('should return my boards', async () => {
       const result = await boardController.getMyBoards(mockUser);
       expect(result).toEqual([mockBoardDto]);
-      expect(boardService.getMyBoards).toHaveBeenCalledWith(mockUser.id);
+      expect(mockBoardService.getMyBoards).toHaveBeenCalledWith(mockUser.id);
     });
   });
 
   describe('createBoard', () => {
     it('should create a board', async () => {
       await boardController.createBoard(mockUser, mockBoardDto);
-      expect(boardService.createBoard).toHaveBeenCalledWith(
+      expect(mockBoardService.createBoard).toHaveBeenCalledWith(
         mockUser.id,
         mockBoardDto,
       );
@@ -76,7 +76,7 @@ describe('BoardController', () => {
         mockBoardDto,
       );
       expect(result).toEqual(mockBoardDto);
-      expect(boardService.updateBoard).toHaveBeenCalledWith(
+      expect(mockBoardService.updateBoard).toHaveBeenCalledWith(
         1,
         mockUser.id,
         mockBoardDto,
@@ -87,7 +87,7 @@ describe('BoardController', () => {
   describe('deleteBoard', () => {
     it('should delete a board', async () => {
       await boardController.deleteBoard(mockUser, 1);
-      expect(boardService.deleteBoard).toHaveBeenCalledWith(mockUser.id, 1);
+      expect(mockBoardService.deleteBoard).toHaveBeenCalledWith(mockUser.id, 1);
     });
   });
 
@@ -95,7 +95,7 @@ describe('BoardController', () => {
     it('should return a link to the board', async () => {
       const result = await boardController.linkBoard(mockUser, 1);
       expect(result).toEqual('http://link-to-board.com');
-      expect(boardService.linkBoard).toHaveBeenCalledWith(1, mockUser.id);
+      expect(mockBoardService.linkBoard).toHaveBeenCalledWith(1, mockUser.id);
     });
   });
 });
