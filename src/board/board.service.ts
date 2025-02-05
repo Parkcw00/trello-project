@@ -23,9 +23,21 @@ export class BoardService {
   ) {}
 
   async getMyBoards(ownerId: number): Promise<Board[]> {
-    return await this.boardRepository.findBy({
+    // Redis에서 캐시된 보드 목록 조회
+    const cachedBoards = await this.redisService.get(`boards:${ownerId}`);
+    if (cachedBoards) {
+      return cachedBoards; // 캐시된 데이터 반환
+    }
+
+    // 캐시가 없을 경우 데이터베이스에서 조회
+    const boards = await this.boardRepository.findBy({
       ownerId: ownerId,
     });
+
+    // 조회한 보드 목록을 Redis에 저장
+    await this.redisService.set(`boards:${ownerId}`, boards, 60); // 60초 동안 캐시
+
+    return boards;
   }
 
   async getBoard(ownerId: number, boardId: number): Promise<Board> {
@@ -94,7 +106,7 @@ export class BoardService {
     await this.verifyMessage(id, ownerId);
     await this.boardRepository.delete({ id });
   }
-
+await this.redisService.get(`board:${boardId}`)
   private async verifyMessage(id: number, ownerId: number) {
     const boardMessage = await this.boardRepository.findOneBy({
       id,
