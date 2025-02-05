@@ -17,7 +17,7 @@ import { Card } from './entities/card.entity';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from 'src/utils/userInfo.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('카드CRUD')
 @ApiBearerAuth()
@@ -83,5 +83,3 @@ export class CardController {
     return { message: '카드가 삭제되었습니다' };
   }
 }
-
-// 미들웨어를 거쳐서 req.user로 받아오도록

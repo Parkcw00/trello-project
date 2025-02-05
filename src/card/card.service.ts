@@ -8,7 +8,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { Repository } from 'typeorm'; // TypeORM의 Repository를 가져옵니다.
 import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
-import { Member } from 'src/member/entities/member.entity';
+import { Member } from '../member/entities/member.entity';
 import { Board } from 'src/board/entities/board.entity';
 import { LexoRank } from 'lexorank';
 import _ from 'lodash';
