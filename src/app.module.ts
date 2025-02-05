@@ -58,12 +58,17 @@ const typeOrmModuleOptions = {
         DB_SYNC: Joi.boolean().required(),
       }),
     }),
-    RedisModule.forRoot({
-      options: {
-        host: 'localhost',
-        port: 6379,
-      },
-      type: 'single',
+    RedisModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        options: {
+          host: configService.get('REDIS_NAME'),
+          port: configService.get('REDIS_PORT'),
+          username: configService.get('REDIS_USER'),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+        type: 'single',
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
