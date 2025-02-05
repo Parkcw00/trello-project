@@ -8,6 +8,7 @@ import { Board } from './entities/board.entity';
 import { Member } from '../member/entities/member.entity';
 import { v4 as uuidv4 } from 'uuid'; // UUID 생성
 import { BoardDto } from './dto/board.dto';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class BoardService {
@@ -17,6 +18,8 @@ export class BoardService {
 
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
+
+    private readonly redisService: RedisService, // RedisService 주입
   ) {}
 
   async getMyBoards(ownerId: number): Promise<Board[]> {
@@ -33,12 +36,19 @@ export class BoardService {
       throw new NotFoundException('해당 보드에 대한 접근 권한이 없습니다.');
     }
 
+    const cachedBoard = await this.redisService.get(`board:${boardId}`);
+    if (cachedBoard) {
+      return cachedBoard; // 캐시된 데이터 반환
+    }
+
     const board = await this.boardRepository.findOne({
       where: { id: boardId },
     });
     if (!board) {
       throw new NotFoundException(`보드를 찾을 수 없습니다.`);
     }
+
+    await this.redisService.set(`board:${boardId}`, board, 60); // Redis에 보드 정보 저장
     return board;
   }
 

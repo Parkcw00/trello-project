@@ -15,7 +15,7 @@ import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
-
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { APP_GUARD } from '@nestjs/core'; // 추가
 
 const typeOrmModuleOptions = {
@@ -58,6 +58,13 @@ const typeOrmModuleOptions = {
         DB_SYNC: Joi.boolean().required(),
       }),
     }),
+    RedisModule.forRoot({
+      options: {
+        host: 'localhost',
+        port: 6379,
+      },
+      type: 'single',
+    }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
     CommentModule,
@@ -70,6 +77,5 @@ const typeOrmModuleOptions = {
     AuthModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule {}
