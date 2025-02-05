@@ -1,72 +1,70 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Member } from './entities/member.entity';
-import { AuthGuard } from '@nestjs/passport';
-import { ExecutionContext } from '@nestjs/common';
+import { User } from '../user/entities/user.entity';
+import { Board } from '../board/entities/board.entity';
+import { NotFoundException, UnauthorizedException, ConflictException } from '@nestjs/common';
 
-describe('MemberController', () => {
-  let memberController: MemberController;
-  let memberService: MemberService;
+describe('MemberService', () => {
+  let service: MemberService;
+  let memberRepository: jest.Mocked<Repository<Member>>;
+  let userRepository: jest.Mocked<Repository<User>>;
+  let boardRepository: jest.Mocked<Repository<Board>>;
 
   beforeEach(async () => {
-    // MemberService의 가짜(Mock) 객체를 생성하여 실제 DB 접근을 방지하고 테스트 속도를 향상
-    const mockMemberService = {
-      findAll: jest.fn(),
+    // Jest Mock Repository 생성
+    const mockMemberRepository = {
       findOne: jest.fn(),
+      find: jest.fn(),
       create: jest.fn(),
-      delete: jest.fn(),
+      save: jest.fn(),
+      remove: jest.fn(),
     };
 
-    // JWT 인증을 Mock 객체로 설정하여 실제 인증을 거치지 않고 테스트 가능하도록 처리
-    const mockAuthGuard = {
-      canActivate: jest.fn((context: ExecutionContext) => {
-        const req = context.switchToHttp().getRequest();
-        req.user = { id: 1 }; // Mock JWT 인증된 사용자 정보 추가
-        return true; // 모든 요청을 인증된 것으로 처리
-      }),
+    const mockUserRepository = {
+      findOne: jest.fn(),
+    };
+
+    const mockBoardRepository = {
+      findOne: jest.fn(),
     };
 
     // NestJS 테스트 모듈 설정
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [MemberController], // 테스트할 컨트롤러 등록
       providers: [
-        {
-          provide: MemberService,
-          useValue: mockMemberService, // MemberService를 Mock 객체로 대체하여 주입
-        },
+        MemberService, // 실제 테스트할 MemberService 주입
+        { provide: getRepositoryToken(Member), useValue: mockMemberRepository },
+        { provide: getRepositoryToken(User), useValue: mockUserRepository },
+        { provide: getRepositoryToken(Board), useValue: mockBoardRepository },
       ],
-    })
-      .overrideGuard(AuthGuard('jwt')) // 실제 AuthGuard를 Mock 객체로 대체하여 JWT 인증 우회
-      .useValue(mockAuthGuard)
-      .compile();
+    }).compile();
 
-    memberController = module.get<MemberController>(MemberController);
-    memberService = module.get<MemberService>(MemberService);
+    // 각 의존성을 모듈에서 가져오기
+    service = module.get<MemberService>(MemberService);
+    memberRepository = module.get(getRepositoryToken(Member));
+    userRepository = module.get(getRepositoryToken(User));
+    boardRepository = module.get(getRepositoryToken(Board));
   });
 
   /**
-   * 특정 보드의 모든 멤버 목록을 조회하는 테스트
+   * 특정 보드의 모든 멤버 목록 조회 테스트
    */
   describe('findAll', () => {
-    it('멤버 목록을 반환해야 함', async () => {
-      // Mock 멤버 데이터 설정
-      const mockMembers: Member[] = [{ id: 1, userId: 1, boardId: 1 } as Member];
+    it('보드가 존재하면 멤버 목록을 반환해야 함', async () => {
+      boardRepository.findOne.mockResolvedValue({ id: 1 } as Board);
+      memberRepository.find.mockResolvedValue([{ id: 1, userId: 2 } as Member]);
 
-      // MemberService의 findAll이 가짜 데이터를 반환하도록 설정
-      jest.spyOn(memberService, 'findAll').mockResolvedValue({
-        message: '멤버 조회 성공',
-        members: mockMembers,
-      });
+      const result = await service.findAll(1);
 
-      // findAll 실행
-      const result = await memberController.findAll(1);
+      expect(result).toEqual({ message: '멤버 조회 성공', members: [{ id: 1, userId: 2 }] });
+    });
 
-      // 반환값 검증
-      expect(result).toEqual({ message: '멤버 조회 성공', members: mockMembers });
-      expect(memberService.findAll).toHaveBeenCalledWith(1); // findAll이 호출되었는지 확인
+    it('보드가 존재하지 않으면 NotFoundException을 던져야 함', async () => {
+      boardRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findAll(999)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -74,22 +72,18 @@ describe('MemberController', () => {
    * 특정 멤버 조회 테스트
    */
   describe('findOne', () => {
-    it('특정 멤버 정보를 반환해야 함', async () => {
-      // Mock 멤버 데이터 설정
-      const mockMember: Member = { id: 2, userId: 3, boardId: 1 } as Member;
+    it('멤버가 존재하면 상세 정보를 반환해야 함', async () => {
+      memberRepository.findOne.mockResolvedValue({ id: 1, userId: 2 } as Member);
 
-      // MemberService의 findOne이 가짜 데이터를 반환하도록 설정
-      jest.spyOn(memberService, 'findOne').mockResolvedValue({
-        message: '멤버 상세 조회 성공',
-        member: mockMember,
-      });
+      const result = await service.findOne(1, 1);
 
-      // findOne 실행
-      const result = await memberController.findOne(1, 2);
+      expect(result).toEqual({ message: '멤버 상세 조회 성공', member: { id: 1, userId: 2 } });
+    });
 
-      // 반환값 검증
-      expect(result).toEqual({ message: '멤버 상세 조회 성공', member: mockMember });
-      expect(memberService.findOne).toHaveBeenCalledWith(1, 2);
+    it('멤버가 존재하지 않으면 NotFoundException을 던져야 함', async () => {
+      memberRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findOne(1, 999)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -97,21 +91,34 @@ describe('MemberController', () => {
    * 멤버 추가 테스트
    */
   describe('create', () => {
-    it('새로운 멤버를 추가해야 함', async () => {
-      const dto: CreateMemberDto = { userId: 3 };
+    it('멤버가 정상적으로 추가되면 성공 메시지를 반환해야 함', async () => {
+      boardRepository.findOne.mockResolvedValue({ id: 1 } as Board);
+      userRepository.findOne.mockResolvedValue({ id: 2 } as User);
+      memberRepository.findOne.mockResolvedValue(null); // 중복 체크용
+      memberRepository.create.mockReturnValue({ id: 3, boardId: 1, userId: 2 } as Member);
+      memberRepository.save.mockResolvedValue({ id: 3, boardId: 1, userId: 2 } as Member);
 
-      // MemberService의 create가 실행되면 성공 메시지를 반환하도록 설정
-      jest.spyOn(memberService, 'create').mockResolvedValue({ message: '멤버가 추가되었습니다!' });
+      const createMemberDto = { userId: 2 };
+      const result = await service.create(1, createMemberDto, 2);
 
-      // 요청 객체(req) 생성 - JWT 인증된 사용자 정보 포함
-      const mockRequest = { user: { id: 1 } };
-
-      // create 실행
-      const result = await memberController.create(1, dto, mockRequest);
-
-      // 반환값 검증
       expect(result).toEqual({ message: '멤버가 추가되었습니다!' });
-      expect(memberService.create).toHaveBeenCalledWith(1, dto, 1);
+    });
+
+    it('보드가 존재하지 않으면 NotFoundException을 던져야 함', async () => {
+      boardRepository.findOne.mockResolvedValue(null);
+      const createMemberDto = { userId: 2 };
+
+      await expect(service.create(999, createMemberDto, 2)).rejects.toThrow(NotFoundException);
+    });
+
+    it('중복된 멤버가 추가될 경우 ConflictException을 던져야 함', async () => {
+      boardRepository.findOne.mockResolvedValue({ id: 1 } as Board);
+      userRepository.findOne.mockResolvedValue({ id: 2 } as User);
+      memberRepository.findOne.mockResolvedValue({ id: 3 } as Member); // 이미 존재하는 멤버
+
+      const createMemberDto = { userId: 2 };
+
+      await expect(service.create(1, createMemberDto, 2)).rejects.toThrow(ConflictException);
     });
   });
 
@@ -119,40 +126,25 @@ describe('MemberController', () => {
    * 멤버 삭제 테스트
    */
   describe('delete', () => {
-    it('멤버 삭제 성공', async () => {
-      // MemberService의 delete가 실행되면 성공 메시지를 반환하도록 설정
-      jest.spyOn(memberService, 'delete').mockResolvedValue({ message: '멤버 삭제 성공' });
+    it('본인이 멤버일 경우 삭제가 성공해야 함', async () => {
+      memberRepository.findOne.mockResolvedValue({ id: 1, boardId: 1, userId: 2 } as Member);
 
-      // JWT 인증된 사용자 정보 포함
-      const mockRequest = { user: { id: 1 } };
+      const result = await service.delete(1, 1, 2);
 
-      // delete 실행
-      const result = await memberController.delete(1, 2, mockRequest);
-
-      // 반환값 검증
       expect(result).toEqual({ message: '멤버 삭제 성공' });
-      expect(memberService.delete).toHaveBeenCalledWith(1, 2, 1);
+      expect(memberRepository.remove).toHaveBeenCalledWith({ id: 1, boardId: 1, userId: 2 });
     });
 
-    it('본인이 아닌 멤버 삭제 시 UnauthorizedException 발생', async () => {
-      // MemberService의 delete가 UnauthorizedException을 반환하도록 설정
-      jest.spyOn(memberService, 'delete').mockRejectedValue(new UnauthorizedException('해당 멤버를 삭제할 수 없습니다.'));
+    it('멤버가 존재하지 않으면 NotFoundException을 던져야 함', async () => {
+      memberRepository.findOne.mockResolvedValue(null);
 
-      // 요청한 사용자와 삭제 대상 사용자가 다름
-      const mockRequest = { user: { id: 2 } };
-
-      // delete 실행 시 UnauthorizedException 발생 여부 확인
-      await expect(memberController.delete(1, 2, mockRequest)).rejects.toThrow(UnauthorizedException);
+      await expect(service.delete(1, 999, 2)).rejects.toThrow(NotFoundException);
     });
 
-    it('존재하지 않는 멤버 삭제 시 NotFoundException 발생', async () => {
-      // MemberService의 delete가 NotFoundException을 반환하도록 설정
-      jest.spyOn(memberService, 'delete').mockRejectedValue(new NotFoundException('해당 멤버가 존재하지 않습니다.'));
+    it('본인이 아닌 멤버를 삭제하려 하면 UnauthorizedException을 던져야 함', async () => {
+      memberRepository.findOne.mockResolvedValue({ id: 1, boardId: 1, userId: 3 } as Member);
 
-      const mockRequest = { user: { id: 1 } };
-
-      // delete 실행 시 NotFoundException 발생 여부 확인
-      await expect(memberController.delete(1, 99, mockRequest)).rejects.toThrow(NotFoundException);
+      await expect(service.delete(1, 1, 2)).rejects.toThrow(UnauthorizedException);
     });
   });
 });
