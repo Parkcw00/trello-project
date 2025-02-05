@@ -100,13 +100,15 @@ export class BoardService {
     const { title, content, expriyDate } = boardDto;
     await this.verifyMessage(id, ownerId);
     await this.boardRepository.update({ id }, { title, content, expriyDate });
+    await this.redisService.del(`board:${id}`);
   }
 
   async deleteBoard(ownerId: number, id: number): Promise<void> {
     await this.verifyMessage(id, ownerId);
     await this.boardRepository.delete({ id });
+    await this.redisService.del(`board:${id}`);
   }
-await this.redisService.get(`board:${boardId}`)
+
   private async verifyMessage(id: number, ownerId: number) {
     const boardMessage = await this.boardRepository.findOneBy({
       id,
