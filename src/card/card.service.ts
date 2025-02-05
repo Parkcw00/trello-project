@@ -10,9 +10,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Card } from './entities/card.entity';
 import { Member } from '../member/entities/member.entity';
 import { Board } from 'src/board/entities/board.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LexoRank } from 'lexorank';
 import _ from 'lodash';
-import { CreateColumnDto } from 'src/column/dto/create-column.dto';
+// import { CreateColumnDto } from 'src/column/dto/create-column.dto';
 import { ColumnEntity } from 'src/column/entities/column.entity';
 
 // 카드 서비스를 정의하는 클래스입니다.
@@ -26,7 +27,8 @@ export class CardService {
     @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(Card) // Card 엔티티에 대한 레포지토리를 주입합니다.
     private cardRepository: Repository<Card>, // 주입된 레포지토리를 private 변수로 선언합니다.
-  ) {}
+    private eventEmitter2: EventEmitter2,
+  ) { }
   async createCard(
     userId: number,
     columnId: number,
@@ -67,6 +69,9 @@ export class CardService {
     });
 
     const savedCard = await this.cardRepository.save(newCard);
+
+    this.eventEmitter2.emit('card.created', { boardId: columnId, cardData: savedCard });
+
     return savedCard;
   }
 

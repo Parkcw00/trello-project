@@ -17,7 +17,9 @@ import { ColumnModule } from 'src/column/column.module';
     MemberModule,
     ColumnModule,
   ],
+  exports: [TypeOrmModule],
   controllers: [CardController],
   providers: [CardService],
 })
-export class CardModule {}
+
+export class CardModule { }

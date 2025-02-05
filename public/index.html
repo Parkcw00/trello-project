@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 알림</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>실시간 알림</h1>
+    <div id="notifications"></div>
+
+    <script>
+        // 로그인 후 서버로부터 받은 JWT 토큰을 로컬 스토리지에 저장
+        localStorage.setItem('jwtToken', 'your_jwt_token');
+
+        // WebSocket 연결 시 토큰과 보드 ID를 사용
+        const token = localStorage.getItem('jwtToken');
+        const boardId = '2'; // 보드 ID는 필요에 따라 설정
+
+        // 서버와의 WebSocket 연결 설정
+        const socket = io('http://localhost:3000/alarm', {
+            query: {
+                token: 'your_jwt_token', // 실제 JWT 토큰으로 대체하세요
+                boardId: '2' // 실제 보드 ID로 대체하세요
+            }
+        });
+
+        // 'cardCreated' 이벤트 수신
+        socket.on('cardCreated', (data) => {
+            const notificationsDiv = document.getElementById('notifications');
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `새 카드 생성: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+        });
+
+        // 연결 오류 처리
+        socket.on('connect_error', (err) => {
+            console.error('연결 오류:', err);
+        });
+    </script>
+</body>
+
+</html>
