@@ -15,6 +15,7 @@ import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
+import { ChecklistModule } from './checklist/checklist.module';
 
 import { APP_GUARD } from '@nestjs/core'; // 추가
 
@@ -68,6 +69,7 @@ const typeOrmModuleOptions = {
     CardModule,
     FileModule,
     AuthModule,
+    ChecklistModule,
   ],
   controllers: [],
   providers: [],

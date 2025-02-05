@@ -13,3 +13,4 @@ export class CreateCommentDto extends PickType(Comment, [
   @IsString() // 데코레이터 사용 ( 문자열 타입 )
   content: string;
 }
+

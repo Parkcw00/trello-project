@@ -14,7 +14,8 @@ import { MemberModule } from 'src/member/member.module';
     BoardModule,
     MemberModule,
   ],
+  exports: [TypeOrmModule],
   controllers: [ColumnController], // 컨트롤러 등록
   providers: [ColumnService], // 서비스 등록
 })
-export class ColumnModule {}
+export class ColumnModule { }

@@ -10,16 +10,21 @@ import { ColumnEntity } from './entities/column.entity'; // 엔티티 가져오�
 import { InjectRepository } from '@nestjs/typeorm'; // 리포지토리 의존성 주입
 import { LexoRank } from 'lexorank';
 import { Member } from 'src/member/entities/member.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable() // 서비스에 리포지토리를 의존성 주입
 export class ColumnService {
+  createColumn(userId: number, boardId: number, createColumnDto: CreateColumnDto) {
+    throw new Error('Method not implemented.');
+  }
   // 서비스 클래스
   constructor(
     // 인스턴스를 생성할때 쓰이는 메서드
     @InjectRepository(ColumnEntity)
     private columnRepository: Repository<ColumnEntity>,
+    private eventEmitter2: EventEmitter2,
     @InjectRepository(Member) private memberRepository: Repository<Member>, // 리포지토리 인스턴스 생성
-  ) {} // 생성자 메서드
+  ) { } // 생성자 메서드
 
   async create(
     userId: number,
@@ -30,7 +35,7 @@ export class ColumnService {
 
 
     const checkMember = await this.memberRepository.findOne({
-      where: { userId: userId, boardId:boardId },
+      where: { userId: userId, boardId: boardId },
     });
     if (!checkMember) {
       throw new NotFoundException(
@@ -57,8 +62,11 @@ export class ColumnService {
     });
 
     const savedColumn = await this.columnRepository.save(newColumn);
+
+    this.eventEmitter2.emit('column.created', { boardId: boardId, columnData: savedColumn });
     return savedColumn;
   }
+
 
   async findAll(boardId: number, userId: number): Promise<ColumnEntity[]> {
     // 모든 컬럼 조회 메서드
@@ -221,8 +229,9 @@ export class ColumnService {
         { id: columnId, boardId },
         { lexo: newRank.toString() },
       );
-
-      return await this.columnRepository.findOne({ where: { id: columnId } });
+      const updatedColumn = await this.columnRepository.findOne({ where: { id: columnId } });
+      this.eventEmitter2.emit('column.created', { boardId: boardId, columnData: updatedColumn });
+      return updatedColumn;
     }
     // 카드의 순서 업데이트
   }
