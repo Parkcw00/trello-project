@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { LexoRank } from 'lexorank';
+import { BadRequestException } from '@nestjs/common';
 
 describe('CardService', () => {
   let service: CardService;
@@ -160,7 +161,12 @@ describe('CardService', () => {
         userId,
       });
       mockCardRepository.find.mockResolvedValue(cards);
-      mockCardRepository.findOne.mockResolvedValue(targetCard);
+
+      mockCardRepository.findOne
+        .mockResolvedValueOnce(cards[0])
+        .mockResolvedValueOnce(targetCard)
+        .mockResolvedValueOnce(updatedCard);
+
       mockCardRepository.update.mockResolvedValue(updatedCard);
 
       const result = await service.updateCardOrder(
@@ -181,18 +187,28 @@ describe('CardService', () => {
       const columnId = 1;
       const column = { id: columnId, board: { id: 99 } };
 
-      // Mock 데이터 설정
-      mockColumnRepository.findOne.mockResolvedValue(column);
-      mockMemberRepository.findOne.mockResolvedValue({
-        boardId: column.board.id,
-        userId,
+      // 컬럼 조회 Mock
+      mockColumnRepository.findOne.mockResolvedValue({
+        id: columnId,
+        board: { id: 1 },
       });
+
+      // 보드 멤버 조회
+      mockMemberRepository.findOne.mockResolvedValue({
+        id: 1,
+        userId,
+        boardId: 1,
+      });
+
+      mockCardRepository.delete.mockResolvedValue({ affected: 1 });
 
       // 카드 삭제 실행
       const result = await service.deleteCard(userId, cardId, columnId);
 
-      // 기대 결과 검증
-      expect(result).toEqual({ message: '카드가 삭제되었습니다' });
+      expect(mockCardRepository.delete).toHaveBeenCalledWith({
+        id: cardId,
+        columnId,
+      });
     });
   });
 });
