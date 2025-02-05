@@ -123,7 +123,10 @@
     "trivago",
     "typeorm",
     "vimdiff"
-  ]
+],
+"[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+}
   // "typescript.inlayHints.enumMemberValues.enabled": true,
   // "javascript.inlayHints.enumMemberValues.enabled": true,
   // "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
