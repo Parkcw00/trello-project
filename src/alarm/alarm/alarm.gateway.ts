@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 
 
-@WebSocketGateway({ namespace: '/alarm' })
+@WebSocketGateway({ namespace: '/alarm', cors: { origin: '*' } })
 export class AlarmGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer()
@@ -13,22 +13,27 @@ export class AlarmGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly jwtService: JwtService) { }
 
   handleConnection(client: Socket) {
+    console.log('클라이언트 연결 시도:', client.id);
     const token = client.handshake.query.token as string;
+    console.log('토큰:', token);
     if (!token) {
+      console.log('토큰 없음, 연결 종료');
       client.disconnect();
       return;
     }
 
     try {
       const decoded = this.jwtService.verify(token);
+      console.log('토큰 검증 성공:', decoded);
       const boardId = client.handshake.query.boardId;
       if (boardId && decoded.memberId) {
         client.join(`board-${boardId}`);
-        console.log(`유저저 ${decoded.memberId}가 게시판 ${boardId}에 참여했습니다.`);
+        console.log(`유저 ${decoded.memberId}가 게시판 ${boardId}에 참여했습니다.`);
       } else {
         client.disconnect();
       }
     } catch (err) {
+      console.log('토큰 검증 실패:', err);
       client.disconnect();
     }
   }
