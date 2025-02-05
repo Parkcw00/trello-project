@@ -59,7 +59,8 @@
   "[typescript]": {
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
-    "typescript.preferences.importModuleSpecifierEnding": "auto"
+    "typescript.preferences.importModuleSpecifierEnding": "auto",
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "editor.detectIndentation": false,
   "workbench.colorCustomizations": {
