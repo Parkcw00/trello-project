@@ -70,7 +70,7 @@ export class CardService {
 
     const savedCard = await this.cardRepository.save(newCard);
 
-    this.eventEmitter2.emit('card.created', { boardId: columnId, cardData: savedCard });
+    this.eventEmitter2.emit('card.created', { boardId: column.board.id, cardData: savedCard });
 
     return savedCard;
   }
@@ -241,8 +241,9 @@ export class CardService {
         { id: cardId, columnId },
         { lexo: newRank.toString() },
       );
-
-      return await this.cardRepository.findOne({ where: { id: cardId } });
+      const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+      this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+      return updatedCard;
     }
     // 카드의 순서 업데이트
   }
