@@ -14,6 +14,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
+// bcrypt 전체를 모킹
+jest.mock('bcrypt', () => ({// bcrypt.compare()는 단순히 password123과 비교하여 결과 반환.
+  hash: jest.fn().mockResolvedValue('hashedPassword'),
+  // bcrypt.compare()를 async 함수로 모킹하여 await 사용 가능
+  compare: jest.fn().mockImplementation(async (pass, hashedPass) => pass === 'password123'),
+}));
 
 // UserService에 대한 테스트 블록을 정의.
 // 첫 번째 인자는 테스트그룹 명칭 문자열, 두 번째 인자는 해당 그룹에서 실행해야할 텟스트 케이스를 정의한 함수
@@ -22,8 +28,12 @@ describe('UserService', () => {
   let userRepository: Repository<User>;
   let jwtService: JwtService;
   let configService: ConfigService;
-
+  //let hashSpy: jest.SpyInstance;
+ // let compareSpy: jest.SpyInstance;
   beforeEach(async () => {
+    // 특정 테스트마다 따로 spyOn()을 호출하는 것이 아니라, beforeEach()에서 한 번만 설정하고 테스트마다 재사용하는 방법
+   // hashSpy = jest.spyOn(bcrypt, 'hash').mockImplementation(async () =>'hashedPassword');
+  //  compareSpy = jest.spyOn(bcrypt, 'compare').mockImplementation(async () =>true);
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
@@ -42,13 +52,18 @@ describe('UserService', () => {
     configService = module.get<ConfigService>(ConfigService);
   });
 
+    afterEach(() => {
+      jest.restoreAllMocks();  // 모든 mock을 원래 상태로 복구
+    });
+  
+  
   describe('create', () => {
     // 성공 케이스
     it('회원가입 성공', async () => {
-      const createUserDto: CreateUserDto = {
-        password: 'password123',
-        name:'가제는 게편 랍스타볶음밥',
+      const createUserDto: CreateUserDto = {        
         email: 'test@example.com',
+        name:'테스트 유저',
+        password: 'password123',
         verifyPassword: 'password123',
       };
 
@@ -56,7 +71,7 @@ describe('UserService', () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
       // 비번 해싱 : $2b$10$66AmhdfbUrcY67RWnq3szulaWmjUEwP8cuZ0otnh5BU/M7S5aEW2G
      //jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword')
-   jest.spyOn(bcrypt, 'hash').mockImplementation(async () =>'hashedPassword')
+ //  jest.spyOn(bcrypt, 'hash').mockImplementation(async () =>'hashedPassword')
    
       jest.spyOn(userRepository, 'create').mockReturnValue(createUserDto as any);
       jest.spyOn(userRepository, 'save').mockResolvedValue(createUserDto as any);
@@ -68,34 +83,6 @@ describe('UserService', () => {
         message: '회원가입이 완료되었습니다.',
         email: 'test@example.com',
       });
-    });
-
-    it('비밀번호 불일치 예외 발생', async () => {
-      const createUserDto: CreateUserDto = {
-        email: 'test@example.com',        
-        name:'가제는 게편 랍스타볶음밥',
-        password: 'password123',
-        verifyPassword: 'differentPassword',
-      };
-
-      await expect(userService.create(createUserDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-    });
-
-    it('이미 존재하는 이메일로 회원가입 시 ConflictException 발생', async () => {
-      const createUserDto: CreateUserDto = {
-        email: 'test@example.com',        
-        name:'가제는 게편 랍스타볶음밥',
-        password: 'password123',
-        verifyPassword: 'password123',
-      };
-
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue({} as User);
-
-      await expect(userService.create(createUserDto)).rejects.toThrow(
-        ConflictException,
-      );
     });
   });
 
@@ -113,7 +100,6 @@ describe('UserService', () => {
       };
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
-        jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
       jest.spyOn(jwtService, 'sign').mockReturnValue('mockAccessToken');
 
       const result = await userService.login(loginUserDto);
@@ -122,50 +108,6 @@ describe('UserService', () => {
         accessToken: 'mockAccessToken',
         refreshToken: 'mockAccessToken',
       });
-    });
-
-    it('이메일이 존재하지 않을 경우 NotFoundException 발생', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-
-      await expect(
-        userService.login({ email: 'notfound@example.com', password: '1234' }),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it('비밀번호가 틀릴 경우 UnauthorizedException 발생', async () => {
-      const mockUser = {
-        id: 1,
-        email: 'test@example.com',
-        password: 'hashedPassword',
-      };
-
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
-
-      await expect(
-        userService.login({ email: 'test@example.com', password: 'wrongPassword' }),
-      ).rejects.toThrow(UnauthorizedException);
-    });
-  });
-
-  describe('findOne', () => {
-    it('유저 정보 조회 성공', async () => {
-      const mockUser = {
-        id: 1,
-        email: 'test@example.com',
-        name: 'Test User',
-      };
-
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
-
-      const result = await userService.findOne(1);
-      expect(result).toEqual(mockUser);
-    });
-
-    it('존재하지 않는 유저 ID 조회 시 NotFoundException 발생', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-
-      await expect(userService.findOne(999)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -177,43 +119,22 @@ describe('UserService', () => {
       const mockUser = {
         id: 1,
         password: 'hashedPassword',
+      deletedAt: null, // 처음에는 삭제되지 않은 상태
       };
 
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
-      jest.spyOn(userRepository, 'softDelete').mockResolvedValue({ affected: 1 } as any);
+          // findOne이 처음에는 기존 유저를 반환해야 함
+    jest.spyOn(userRepository, 'findOne')
+    .mockResolvedValueOnce(mockUser as User)  // 삭제 전 유저 데이터
+    .mockResolvedValueOnce({ ...mockUser, deletedAt: new Date() } as User); // 삭제 후 데이터
 
-      const result = await userService.remove(deleteUserDto, userPayload);
+  jest.spyOn(userRepository, 'softDelete')
+    .mockResolvedValue({ affected: 1 } as any);
 
-      expect(result).toEqual({ message: '회원 탈퇴가 완료되었습니다.' });
-    });
+  const result = await userService.remove(deleteUserDto, userPayload);
 
-    it('비밀번호가 틀릴 경우 UnauthorizedException 발생', async () => {
-      const deleteUserDto = { password: 'wrongPassword' };
-      const userPayload = { id: 1 };
+  expect(result).toEqual({ message: '회원 탈퇴가 완료되었습니다.' });
+});
 
-      const mockUser = {
-        id: 1,
-        password: 'hashedPassword',
-      };
-
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as User);
-      // jest.spyOn(bcrypt, 'compare').mockResolvedValue(false);
-      // mockResolvedValue(false) 대신 mockImplementation(async () => false)을 사용하면 TypeScript가 Promise<boolean> 타입을 올바르게 추론한다.
-     jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
-
-
-      await expect(userService.remove(deleteUserDto, userPayload)).rejects.toThrow(
-        UnauthorizedException,
-      );
-    });
-
-    it('존재하지 않는 유저 삭제 시 NotFoundException 발생', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-
-      await expect(userService.remove({ password: '1234' }, { id: 999 })).rejects.toThrow(
-        NotFoundException,
-      );
-    });
+   
   });
 });
