@@ -7,8 +7,8 @@ export class AlarmListener {
   constructor(private readonly alarmGateway: AlarmGateway) { }
   @OnEvent('card.created')
   handleCardCreatedEvent(payload: { boardId: number; cardData: any }) {
-    console.log('서버에서 카드 생성 이벤트 발생:', payload); // 이벤트 발행 로그
-    // 방 이름과 이벤트 데이터 확인
+    console.log('서버에서 카드 생성 이벤트 발생:', payload);
+
 
     const roomName = `board-${payload.boardId}`;
     console.log(`이벤트를 전송할 방: ${roomName}`);
@@ -20,7 +20,7 @@ export class AlarmListener {
 
   @OnEvent('card.updated')
   handleCardUpdatedEvent(payload: { boardId: number; cardData: any }) {
-    console.log('서버에서 카드 업데이트 이벤트 발생:', payload); // 이벤트 발행 로그
+    console.log('서버에서 카드 업데이트 이벤트 발생:', payload);
 
     // 방 이름과 이벤트 데이터 확인
     const roomName = `board-${payload.boardId}`;
@@ -33,7 +33,7 @@ export class AlarmListener {
 
   @OnEvent('column.created')
   handleColumnCreatedEvent(payload: { boardId: number; columnData: any }) {
-    console.log('서버에서 컬럼 생성 이벤트 발생:', payload); // 이벤트 발행 로그
+    console.log('서버에서 컬럼 생성 이벤트 발생:', payload);
 
     // 방 이름과 이벤트 데이터 확인
     const roomName = `board-${payload.boardId}`;
@@ -46,7 +46,7 @@ export class AlarmListener {
 
   @OnEvent('column.updated')
   handleColumnUpdateEvent(payload: { boardId: number; columnData: any }) {
-    console.log('서버에서 컬럼 업데이트 이벤트 발생:', payload); // 이벤트 발행 로그
+    console.log('서버에서 컬럼 업데이트 이벤트 발생:', payload);
 
 
     // 방 이름과 이벤트 데이터 확인
@@ -60,8 +60,7 @@ export class AlarmListener {
 
   @OnEvent('comment.created')
   handleCommentCreatedEvent(payload: { boardId: number; commentData: any }) {
-    console.log('서버에서 댓글 생성 이벤트 발생:', payload); // 이벤트 발행 로그
-
+    console.log('서버에서 댓글 생성 이벤트 발생:', payload);
 
     // 방 이름과 이벤트 데이터 확인
     const roomName = `board-${payload.boardId}`;
@@ -74,7 +73,7 @@ export class AlarmListener {
 
   @OnEvent('comment.updated')
   handleCommentUpdateEvent(payload: { boardId: number; commentData: any }) {
-    console.log('서버에서 댓글 업데이트 이벤트 발생:', payload); // 이벤트 발행 로그
+    console.log('서버에서 댓글 업데이트 이벤트 발생:', payload);
 
 
     // 방 이름과 이벤트 데이터 확인
