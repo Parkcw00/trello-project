@@ -7,8 +7,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Member } from './entities/member.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Board } from 'src/board/entities/board.entity';
+import { User } from '../user/entities/user.entity';
+import { Board } from '../board/entities/board.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
 
 @Injectable()
@@ -22,8 +22,8 @@ export class MemberService {
 
   /**
    * 특정 보드의 모든 멤버 목록 조회
-   * @param boardId 조회할 보드의 ID
-   * @returns 멤버 목록과 성공 메시지
+   * param boardId 조회할 보드의 ID
+   * returns 멤버 목록과 성공 메시지
    */
   async findAll(boardId: number) {
     // 보드가 존재하는지 확인
