@@ -46,7 +46,7 @@ jobs:
           envs: ENV
           script_stop: true
           script: |
-            cd /trello-project
+            cd /home/ubuntu/trello-project
             rm -rf .env
             git pull origin master
             echo "$ENV" > .env
