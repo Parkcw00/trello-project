@@ -20,7 +20,7 @@
 
 
         const token = 'your_generated_jwt_token'; // 서버에서 생성한 토큰으로 대체
-        const socket = io('http://54.180.123.9/:3000/alarm', {
+        const socket = io('http://54.180.123.9:3000/alarm', {
             query: {
                 token: token,
                 boardId: boardId,
