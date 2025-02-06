@@ -20,6 +20,7 @@ import { ChecklistModule } from './checklist/checklist.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_GUARD } from '@nestjs/core'; // 추가
 import { join } from 'path';
+import { ScraperModule } from './scraper/scraper.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -88,6 +89,7 @@ const typeOrmModuleOptions = {
     FileModule,
     AuthModule,
     ChecklistModule,
+    ScraperModule,
   ],
   controllers: [],
 })
