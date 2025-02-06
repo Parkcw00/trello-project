@@ -24,7 +24,7 @@
     <script>
       async function fetchImages() {
         try {
-          const response = await fetch('http://54.180.123.9:3000/upload'); // ✅ 백엔드에서 이미지 리스트 가져오기
+          const response = await fetch('http://43.202.54.161:3000/upload'); // ✅ 백엔드에서 이미지 리스트 가져오기
           const images = await response.json();
 
           const gallery = document.getElementById('imageGallery');
