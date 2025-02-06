@@ -96,6 +96,7 @@ export class CardService {
     }
     const cachedCards = await this.redisService.get(`cards:${columnId}`);
     if (cachedCards) {
+      console.log(`-------------`, cachedCards);
       return cachedCards; // 캐시된 데이터 반환
     }
 
@@ -143,7 +144,7 @@ export class CardService {
       return cachedCard; // 캐시된 데이터 반환
     }
 
-    await this.redisService.set(`cards:${cardId}`, card, 60);//레디스에 카드정보 저장
+    await this.redisService.set(`card:${cardId}`, card, 60);//레디스에 카드정보 저장
 
     return card; // 카드가 존재하면 반환합니다.
   }
