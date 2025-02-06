@@ -5,7 +5,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT || 3000; // ALB가 여러 서버에 분산하므로 포트를 환경 변수로 관리
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,7 +28,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3000);// ALB가 여러 서버에 분산하므로 포트를 환경 변수로 관리
 }
 
 bootstrap();

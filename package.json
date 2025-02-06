@@ -122,10 +122,10 @@
   "bugs": {
     "url": "https://github.com/Parkcw00/trello-project/issues"
   },
-  "homepage": "https://github.com/Parkcw00/trello-project#readme"
+  "homepage": "https://github.com/Parkcw00/trello-project#readme",
     "testEnvironment": "node",
    
     
    "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/src/$1"
-}
+}}
