@@ -9,6 +9,8 @@ import { Member } from 'src/member/entities/member.entity';
 import { BoardModule } from 'src/board/board.module';
 import { MemberModule } from 'src/member/member.module';
 import { ColumnModule } from 'src/column/column.module';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -16,10 +18,11 @@ import { ColumnModule } from 'src/column/column.module';
     BoardModule,
     MemberModule,
     ColumnModule,
+    RedisModule,
   ],
   exports: [TypeOrmModule],
   controllers: [CardController],
-  providers: [CardService],
+  providers: [CardService, RedisService],
 })
 
 export class CardModule { }
