@@ -18,7 +18,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
+    .addServer(process.env.BASE_URL || 'http://localhost:3000/', 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://production.yourapi.com/', 'Production')
     .addBearerAuth()
