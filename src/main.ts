@@ -2,11 +2,16 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as dotenv from 'dotenv';
 
+dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  app.enableCors(); // ✅ CORS 활성화 (프론트에서 API 호출 가능)
+//추가사항
+  app.enableCors({ 
+    origin: '*', // ✅ 모든 도메인에서 접근 가능하도록 설정 (보안상 필요 시 특정 도메인만 허용)
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // ✅ 허용할 HTTP 메서드 지정
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
