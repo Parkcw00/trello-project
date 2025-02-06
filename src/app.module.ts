@@ -16,8 +16,9 @@ import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
 import { ChecklistModule } from './checklist/checklist.module';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_GUARD } from '@nestjs/core'; // 추가
+import { join } from 'path';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -58,7 +59,14 @@ const typeOrmModuleOptions = {
         DB_NAME: Joi.string().required(),
         DB_SYNC: Joi.boolean().required(),
       }),
+
     }),
+
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/', // ✅ 루트 URL에서 정적 파일 제공
+    }),
+
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
     CommentModule,
@@ -74,4 +82,4 @@ const typeOrmModuleOptions = {
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }
