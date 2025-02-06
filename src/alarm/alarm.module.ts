@@ -8,11 +8,13 @@ import { CardService } from 'src/card/card.service';
 import { ColumnModule } from 'src/column/column.module';
 import { CardModule } from 'src/card/card.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
-  imports: [JwtModule.register({}), ColumnModule, CardModule, EventEmitterModule.forRoot()],
+  imports: [JwtModule.register({}), ColumnModule, CardModule, EventEmitterModule.forRoot(), RedisModule],
   controllers: [AlarmController],
-  providers: [AlarmService, AlarmGateway, AlarmListener, CardService],
+  providers: [AlarmService, AlarmGateway, AlarmListener, CardService, RedisService],
 })
 
 

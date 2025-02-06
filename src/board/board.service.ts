@@ -20,7 +20,7 @@ export class BoardService {
     private memberRepository: Repository<Member>,
 
     private readonly redisService: RedisService, // RedisService 주입
-  ) {}
+  ) { }
 
   async getMyBoards(ownerId: number): Promise<Board[]> {
     // Redis에서 캐시된 보드 목록 조회
@@ -90,6 +90,7 @@ export class BoardService {
         await entityManager.save(member);
       },
     );
+    await this.redisService.del(`boards:${ownerId}`);
   }
 
   async updateBoard(
