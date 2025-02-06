@@ -17,8 +17,9 @@ import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ChecklistModule } from './checklist/checklist.module';
-
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_GUARD } from '@nestjs/core'; // 추가
+import { join } from 'path';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -61,7 +62,7 @@ const typeOrmModuleOptions = {
       }),
     }),
     RedisModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         options: {
           host: configService.get('REDIS_NAME'),
           port: configService.get('REDIS_PORT'),
@@ -71,6 +72,10 @@ const typeOrmModuleOptions = {
         type: 'single',
       }),
       inject: [ConfigService],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/', // ✅ 루트 URL에서 정적 파일 제공
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
