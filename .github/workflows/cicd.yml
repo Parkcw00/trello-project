@@ -48,7 +48,7 @@ jobs:
           script: |
             cd /home/ubuntu/trello-project
             rm -rf .env
-            git pull origin master
+            git pull origin dev
             echo "$ENV" > .env
             npm ci
             npm run build
