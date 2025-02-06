@@ -63,6 +63,7 @@ const typeOrmModuleOptions = {
         DB_SYNC: Joi.boolean().required(),
       }),
     }),
+
     RedisModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         options: {
@@ -75,10 +76,12 @@ const typeOrmModuleOptions = {
       }),
       inject: [ConfigService],
     }),
+
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/', // ✅ 루트 URL에서 정적 파일 제공
     }),
+
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
     CommentModule,
@@ -95,4 +98,4 @@ const typeOrmModuleOptions = {
   ],
   controllers: [],
 })
-export class AppModule { }
+export class AppModule {}
