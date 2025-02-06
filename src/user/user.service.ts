@@ -27,7 +27,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private jwtService: JwtService, // JWT 토큰 생성을 위해 주입한 서비스
     private configService: ConfigService, // .env 파일에 있는 환경 변수 불러오기
-  ) {}
+  ) { }
 
   // 비밀번호 해싱 함수
   private async hashPassword(password: string): Promise<string> {

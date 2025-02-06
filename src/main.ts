@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = process.env.PORT || 3000; // ALB가 여러 서버에 분산하므로 포트를 환경 변수로 관리
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -17,7 +17,7 @@ async function bootstrap() {
     .addBearerAuth()
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
+    .addServer(process.env.BASE_URL || 'http://localhost:3000/', 'Local environment')
     .addServer('https://staging.yourapi.com/', 'Staging')
     .addServer('https://production.yourapi.com/', 'Production')
     .addBearerAuth()
@@ -29,9 +29,7 @@ async function bootstrap() {
 
   SwaggerModule.setup('api-docs', app, document);
 
-  // await app.listen(3000);
-  await app.listen(port);
-  console.log(`Application is running on: ${port}`);
+  await app.listen(process.env.PORT || 3000);
 }
 
 bootstrap();

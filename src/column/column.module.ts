@@ -7,14 +7,18 @@ import { BoardModule } from 'src/board/board.module';
 import { Board } from 'src/board/entities/board.entity';
 import { Member } from 'src/member/entities/member.entity';
 import { MemberModule } from 'src/member/member.module';
+import { RedisService } from '../redis/redis.service';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ColumnEntity, Board, Member]),
     BoardModule,
     MemberModule,
+    RedisModule,
   ],
+  exports: [TypeOrmModule],
   controllers: [ColumnController], // 컨트롤러 등록
-  providers: [ColumnService], // 서비스 등록
+  providers: [ColumnService, RedisService], // 서비스 등록
 })
-export class ColumnModule {}
+export class ColumnModule { }
