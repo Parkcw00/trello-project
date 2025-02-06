@@ -21,6 +21,7 @@
     "typeorm": "typeorm-ts-node-commonjs"
   },
   "dependencies": {
+    "@nestjs-modules/ioredis": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.1",
@@ -30,6 +31,7 @@
     "@nestjs/passport": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-socket.io": "^11.0.7",
+    "@nestjs/serve-static": "^5.0.1",
     "@nestjs/swagger": "^11.0.3",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.0.7",
@@ -44,6 +46,7 @@
     "eventemitter2": "^6.4.9",
     "ioredis": "^5.4.2",
     "joi": "^17.13.3",
+    "JSON": "^1.0.0",
     "lexorank": "^1.0.5",
     "lodash": "^4.17.21",
     "migration": "^0.3.0",
@@ -53,6 +56,7 @@
     "papaparse": "^5.5.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "redis": "^4.7.0",
     "puppeteer": "^24.2.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

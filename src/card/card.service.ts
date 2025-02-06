@@ -15,6 +15,7 @@ import { LexoRank } from 'lexorank';
 import _ from 'lodash';
 // import { CreateColumnDto } from 'src/column/dto/create-column.dto';
 import { ColumnEntity } from 'src/column/entities/column.entity';
+import { RedisService } from '../redis/redis.service';
 
 // 카드 서비스를 정의하는 클래스입니다.
 @Injectable()
@@ -28,6 +29,7 @@ export class CardService {
     @InjectRepository(Card) // Card 엔티티에 대한 레포지토리를 주입합니다.
     private cardRepository: Repository<Card>, // 주입된 레포지토리를 private 변수로 선언합니다.
     private eventEmitter2: EventEmitter2,
+    private readonly redisService: RedisService, // RedisService 주입
   ) { }
   async createCard(
     userId: number,
@@ -69,8 +71,8 @@ export class CardService {
     });
 
     const savedCard = await this.cardRepository.save(newCard);
-
-    this.eventEmitter2.emit('card.created', { boardId: columnId, cardData: savedCard });
+    await this.redisService.del(`cards:${columnId}`);
+    this.eventEmitter2.emit('card.created', { boardId: column.board.id, cardData: savedCard });
 
     return savedCard;
   }
@@ -92,11 +94,20 @@ export class CardService {
         '카드을 조회할 수 있는 권한이 존재하지 않습니다.',
       );
     }
+    const cachedCards = await this.redisService.get(`cards:${columnId}`);
+    if (cachedCards) {
+      console.log(`-------------`, cachedCards);
+      return cachedCards; // 캐시된 데이터 반환
+    }
+
 
     // 주어진 열 ID에 따라 모든 카드를 조회하여 반환합니다.
-    return await this.cardRepository.find({
+    const cards = await this.cardRepository.find({
       where: { columnId }, // 조건: columnId
     });
+    await this.redisService.set(`cards:${columnId}`, cards, 60);
+
+    return cards
   }
 
   // 특정 카드 하나를 찾는 메서드
@@ -127,6 +138,13 @@ export class CardService {
     if (!card) {
       throw new BadRequestException('카드가 존재하지 않습니다.');
     }
+
+    const cachedCard = await this.redisService.get(`card:${cardId}`);//레디스에서 카드정보 가져오기
+    if (cachedCard) {
+      return cachedCard; // 캐시된 데이터 반환
+    }
+
+    await this.redisService.set(`card:${cardId}`, card, 60);//레디스에 카드정보 저장
 
     return card; // 카드가 존재하면 반환합니다.
   }
@@ -165,8 +183,6 @@ export class CardService {
     const CardIndex = cards.findIndex((card) => card.id === cardId);
     const targetCardIndex = cards.findIndex((card) => card.id === targetCardId);
 
-    //-------------------------------------------------------------
-
     if (targetCardIndex < CardIndex) {
       const targetNextCardIndex = targetCardIndex - 1;
 
@@ -180,41 +196,45 @@ export class CardService {
 
       if (targetNextCardIndex < 0) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genNext(); // 현재 카드 다음 랭크
+        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genNext();
 
         await this.cardRepository.update(
           { id: cardId, columnId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.cardRepository.findOne({ where: { id: cardId } });
+        const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+        this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+        return updatedCard;
       }
-      const newRank = LexoRank.parse(targetNextCard.lexo).between(targetRank); // 현재 카드와 타켓 카드 사이의 랭크
+      const newRank = LexoRank.parse(targetNextCard.lexo).between(targetRank);
 
       await this.cardRepository.update(
         { id: cardId, columnId },
         { lexo: newRank.toString() },
       );
 
-      return await this.cardRepository.findOne({ where: { id: cardId } });
+      const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+      this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+      return updatedCard;
     } else {
       const maxIndex: number = cards.length - 1;
 
       if (targetCardIndex === maxIndex) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genPrev(); // 현재 카드 다음 랭크
+        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genPrev();
 
         await this.cardRepository.update(
           { id: cardId, columnId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.cardRepository.findOne({ where: { id: cardId } });
+        const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+        this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+        return updatedCard;
       }
 
       const targetNextCardIndex = targetCardIndex + 1;
-
-      // const existingCard = await this.cardRepository.findOne({ where: { id: targetCardId }, order: { lexo: "DESC" } })
 
       if (!card || !targetCard) {
         throw new BadRequestException('카드가 존재하지 않습니다.');
@@ -226,25 +246,28 @@ export class CardService {
 
       if (targetNextCardIndex === maxIndex) {
         let lexoRank: LexoRank;
-        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genPrev(); // 현재 카드 다음 랭크
+        lexoRank = LexoRank.parse(targetCard.lexo.toString()).genPrev();
 
         await this.cardRepository.update(
           { id: cardId, columnId },
           { lexo: lexoRank.toString() },
         );
 
-        return await this.cardRepository.findOne({ where: { id: cardId } });
+        const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+        this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+        return updatedCard;
       }
-      const newRank = LexoRank.parse(targetNextCard.lexo).between(targetRank); // 현재 카드와 타켓 카드 사이의 랭크
+      const newRank = LexoRank.parse(targetNextCard.lexo).between(targetRank);
 
       await this.cardRepository.update(
         { id: cardId, columnId },
         { lexo: newRank.toString() },
       );
-
-      return await this.cardRepository.findOne({ where: { id: cardId } });
+      await this.redisService.del(`card:${cardId}`);//레디스에서 저장된 카드정보 삭제
+      const updatedCard = await this.cardRepository.findOne({ where: { id: cardId } });
+      this.eventEmitter2.emit('card.updated', { boardId: column.board.id, cardData: updatedCard });
+      return updatedCard;
     }
-    // 카드의 순서 업데이트
   }
 
   // 카드 삭제 메서드
@@ -272,7 +295,7 @@ export class CardService {
       id: cardId,
       columnId, // 삭제 조건: columnId
     });
-
+    await this.redisService.del(`card:${cardId}`);//레디스에서 저장된 카드정보 삭제
     // 삭제된 카드가 없는 경우 예외를 발생시킵니다.
     if (result.affected === 0) {
       throw new BadRequestException('카드를 찾지 못했습니다.');
