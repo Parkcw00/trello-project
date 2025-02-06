@@ -12,6 +12,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Member } from 'src/member/entities/member.entity';
 import { Board } from 'src/board/entities/board.entity'; // 추가된 Board 엔티티
 import { Card } from 'src/card/entities/card.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CommentService {
@@ -19,7 +20,8 @@ export class CommentService {
     @InjectRepository(Comment) private commentRepository: Repository<Comment>,
     @InjectRepository(Member) private memberRepository: Repository<Member>,
     @InjectRepository(Card) private cardRepository: Repository<Card>, // Board 리포지토리 추가
-  ) {}
+    private eventEmitter2: EventEmitter2,
+  ) { }
 
   // 댓글 생성 (사용자가 해당 보드에 속한 경우에만 댓글 작성 허용)
   async createComment(
@@ -50,14 +52,17 @@ export class CommentService {
       }
 
       // 멤버 ID를 기반으로 댓글 생성
-      return await this.commentRepository.save({
+      const newComment = await this.commentRepository.save({
         ...createCommentDto,
         cardId,
         memberId: member.id, // 보드 멤버 ID 할당
       });
+      this.eventEmitter2.emit('comment.created', { boardId: boardId, commentData: newComment });
+      return newComment;
     } catch (error) {
       if (
         error instanceof BadRequestException ||
+
         error instanceof ForbiddenException
       ) {
         throw error;
@@ -65,6 +70,7 @@ export class CommentService {
       throw new BadRequestException('댓글 생성 중 오류가 발생했습니다.');
     }
   }
+
 
   // 댓글 조회 (보드 권한 체크 후 댓글 조회)
   async findComments(cardId: number, userId: number): Promise<Comment[]> {
@@ -191,9 +197,11 @@ export class CommentService {
       );
 
       // 수정된 댓글 반환
-      return await this.commentRepository.findOne({
+      const updatedComment = await this.commentRepository.findOne({
         where: { id: commentId, cardId },
       });
+      this.eventEmitter2.emit('comment.updated', { boardId: comment.card.column.board.id, commentData: updatedComment });
+      return updatedComment
     } catch (error) {
       if (
         error instanceof BadRequestException ||
