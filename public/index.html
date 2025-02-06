@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 알림</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>실시간 알림</h1>
+    <div id="notifications"></div>
+
+    <script>
+        // 수동으로 생성한 JWT 토큰을 사용
+        const urlParams = new URLSearchParams(window.location.search);
+        const boardId = 2; // 보드 ID 설정
+        const columnId = 2; // 컬럼 ID 설정
+
+
+        const token = 'your_generated_jwt_token'; // 서버에서 생성한 토큰으로 대체
+        const socket = io('http://localhost:3000/alarm', {
+            query: {
+                token: token,
+                boardId: boardId,
+                columnId: columnId
+            }
+        });
+
+
+
+        socket.on('connect', () => {
+            console.log('WebSocket 연결 성공');
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('연결 오류:', err);
+        });
+
+        // 'cardCreated' 이벤트 수신
+        socket.on('cardCreated', (data) => {
+            console.log('카드 생성 이벤트 수신:', data); // 콘솔 로그 추가
+            const notificationsDiv = document.getElementById('notifications');
+            const newNotification = document.createElement('div');
+
+            newNotification.textContent = `새 카드 생성: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+        });
+
+        // 'cardUpdated' 이벤트 수신
+        socket.on('cardUpdated', (data) => {
+            console.log('카드 업데이트 이벤트 수신:', data); // 이벤트 수신 로그
+            const notificationsDiv = document.getElementById('notifications');
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `카드 업데이트: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+        });
+
+        // 'columnCreated' 이벤트 수신
+        socket.on('columnCreated', (data) => {
+            console.log('컬럼 생성 이벤트 수신:', data); // 이벤트 수신 로그
+            const notificationsDiv = document.getElementById('notifications');
+
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `컬럼 생성: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+        });
+
+        // 'columnUpdated' 이벤트 수신
+        socket.on('columnUpdated', (data) => {
+            console.log('컬럼 업데이트 이벤트 수신:', data); // 이벤트 수신 로그
+            const notificationsDiv = document.getElementById('notifications');
+
+
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `컬럼 업데이트: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+
+        });
+
+        // 'commentCreated' 이벤트 수신
+        socket.on('commentCreated', (data) => {
+            console.log('댓글 생성 이벤트 수신:', data); // 이벤트 수신 로그
+            const notificationsDiv = document.getElementById('notifications');
+
+
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `댓글 생성: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+
+        });
+
+        // 'commentUpdated' 이벤트 수신
+        socket.on('commentUpdated', (data) => {
+            console.log('댓글 업데이트 이벤트 수신:', data); // 이벤트 수신 로그
+            const notificationsDiv = document.getElementById('notifications');
+
+
+            const newNotification = document.createElement('div');
+            newNotification.textContent = `댓글 업데이트: ${JSON.stringify(data)}`;
+            notificationsDiv.appendChild(newNotification);
+
+        });
+    </script>
+</body>
+
+</html>

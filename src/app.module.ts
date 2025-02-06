@@ -16,6 +16,8 @@ import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { ChecklistModule } from './checklist/checklist.module';
+
 import { APP_GUARD } from '@nestjs/core'; // 추가
 
 const typeOrmModuleOptions = {
@@ -80,7 +82,8 @@ const typeOrmModuleOptions = {
     CardModule,
     FileModule,
     AuthModule,
+    ChecklistModule,
   ],
   controllers: [],
 })
-export class AppModule {}
+export class AppModule { }
