@@ -9,8 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/user/entities/user.entity';
-import { UserInfo } from 'src/utils/userInfo.decorator';
+import { User } from '../user/entities/user.entity';
+import { UserInfo } from '../utils/userInfo.decorator';
 import { ChecklistService } from './checklist.service';
 import { ChecklistDto } from './dto/checklist.dto';
 
