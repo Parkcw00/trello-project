@@ -15,6 +15,7 @@ import { MemberModule } from './member/member.module';
 import { UserModule } from './user/user.module';
 import { FileModule } from './file/file.module';
 import { AuthModule } from './auth/auth.module';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { ChecklistModule } from './checklist/checklist.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { APP_GUARD } from '@nestjs/core'; // 추가
@@ -59,14 +60,23 @@ const typeOrmModuleOptions = {
         DB_NAME: Joi.string().required(),
         DB_SYNC: Joi.boolean().required(),
       }),
-
     }),
-
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        options: {
+          host: configService.get('REDIS_NAME'),
+          port: configService.get('REDIS_PORT'),
+          username: configService.get('REDIS_USER'),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+        type: 'single',
+      }),
+      inject: [ConfigService],
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/', // ✅ 루트 URL에서 정적 파일 제공
     }),
-
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     BoardModule,
     CommentModule,
@@ -80,6 +90,5 @@ const typeOrmModuleOptions = {
     ChecklistModule,
   ],
   controllers: [],
-  providers: [],
 })
 export class AppModule { }
