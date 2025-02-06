@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Checklist } from './entities/checklist.entity';
-import { Card } from 'src/card/entities/card.entity';
-import { Member } from 'src/member/entities/member.entity';
+import { Card } from '../card/entities/card.entity';
+import { Member } from '../member/entities/member.entity';
 import { Repository } from 'typeorm';
 import { ChecklistDto } from './dto/checklist.dto';
 
