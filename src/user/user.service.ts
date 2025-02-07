@@ -12,7 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config'; // .env 파일이나 환경 변수를 쉽게 불러올 수 있도록 도와주는 NestJS의 서비스.
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -27,7 +27,7 @@ export class UserService {
     private userRepository: Repository<User>,
     private jwtService: JwtService, // JWT 토큰 생성을 위해 주입한 서비스
     private configService: ConfigService, // .env 파일에 있는 환경 변수 불러오기
-  ) { }
+  ) {}
 
   // 비밀번호 해싱 함수
   private async hashPassword(password: string): Promise<string> {
